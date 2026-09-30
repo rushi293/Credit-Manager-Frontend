@@ -1,0 +1,954 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Plus, FileText, ArrowUpRight,
+  Users, TrendingUp, AlertTriangle, Wallet, Eye,
+  CreditCard, ShoppingBag, Smartphone,
+} from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, Legend, Cell
+} from 'recharts';
+
+import { dashboardService } from '@/services/dashboard';
+import type { DashboardData, BillStatus, Customer } from '@/types';
+import { formatCurrency, formatDate } from '@/lib/format';
+import { cn } from '@/lib/utils';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEMO / PREVIEW DATA FOR CREDIT SECTION
+// ─────────────────────────────────────────────────────────────────────────────
+const DEMO_DATA: DashboardData = {
+  metrics: {
+    totalCustomers: 8,
+    totalOutstandingCredit: '142500',
+    unpaidBillsCount: 5,
+    partiallyPaidBillsCount: 3,
+    overdueAmount: '38000',
+  },
+  recentBills: [
+    {
+      id: 'demo-bill-1', customerId: 'c1', billNumber: 'INV-009',
+      billDate: '2026-09-18T00:00:00Z', dueDate: '2026-10-18T00:00:00Z',
+      totalAmount: '25000', notes: null, isArchived: false,
+      createdAt: '2026-09-18T00:00:00Z', updatedAt: '2026-09-18T00:00:00Z',
+      customer: { name: 'Ravi Kumar', phone: '9876543210' },
+      remainingAmount: '25000', totalPaid: '0', status: 'UNPAID',
+    },
+    {
+      id: 'demo-bill-2', customerId: 'c2', billNumber: 'INV-008',
+      billDate: '2026-09-15T00:00:00Z', dueDate: '2026-09-25T00:00:00Z',
+      totalAmount: '18000', notes: null, isArchived: false,
+      createdAt: '2026-09-15T00:00:00Z', updatedAt: '2026-09-15T00:00:00Z',
+      customer: { name: 'Sunita Patel', phone: '9812345678' },
+      remainingAmount: '9000', totalPaid: '9000', status: 'PARTIALLY_PAID',
+    },
+    {
+      id: 'demo-bill-3', customerId: 'c3', billNumber: 'INV-007',
+      billDate: '2026-09-10T00:00:00Z', dueDate: '2026-09-10T00:00:00Z',
+      totalAmount: '12000', notes: null, isArchived: false,
+      createdAt: '2026-09-10T00:00:00Z', updatedAt: '2026-09-10T00:00:00Z',
+      customer: { name: 'Mohan Das', phone: '9700001234' },
+      remainingAmount: '12000', totalPaid: '0', status: 'OVERDUE',
+    },
+  ],
+  recentPayments: [
+    {
+      id: 'demo-pay-1', customerId: 'c2', creditBillId: 'demo-bill-2',
+      amount: '9000', paymentDate: '2026-09-16T00:00:00Z', paymentMethod: 'UPI',
+      notes: null, createdAt: '2026-09-16T00:00:00Z', updatedAt: '2026-09-16T00:00:00Z',
+      customer: { name: 'Sunita Patel' }, creditBill: { billNumber: 'INV-008' },
+    },
+    {
+      id: 'demo-pay-2', customerId: 'c4', creditBillId: 'demo-bill-4',
+      amount: '15000', paymentDate: '2026-09-14T00:00:00Z', paymentMethod: 'CASH',
+      notes: null, createdAt: '2026-09-14T00:00:00Z', updatedAt: '2026-09-14T00:00:00Z',
+      customer: { name: 'Geeta Shah' }, creditBill: { billNumber: 'INV-006' },
+    },
+  ],
+};
+
+const DEMO_CUSTOMERS: Customer[] = [
+  { id: 'c3', name: 'Mohan Das',   phone: '9700001234', alternatePhone: null, address: null, notes: null, createdAt: '', updatedAt: '', outstandingBalance: '12000' },
+  { id: 'c1', name: 'Ravi Kumar',  phone: '9876543210', alternatePhone: null, address: null, notes: null, createdAt: '', updatedAt: '', outstandingBalance: '25000' },
+  { id: 'c5', name: 'Arjun Singh', phone: '9611112222', alternatePhone: null, address: null, notes: null, createdAt: '', updatedAt: '', outstandingBalance: '9000' },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TIME & DATE HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getGreetingMessage() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return 'Good morning';
+  if (h >= 12 && h < 17) return 'Good afternoon';
+  if (h >= 17 && h < 21) return 'Good evening';
+  return 'Good night';
+}
+
+function getTodayString() {
+  return new Intl.DateTimeFormat('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  }).format(new Date());
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { useAuth } from '@/context/AuthContext';
+import { ReportsModal } from './components/ReportsModal';
+
+export default function Dashboard() {
+  const { business } = useAuth();
+  const businessName = business?.name || 'Your Shop';
+
+  const [data, setData]       = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isDemo, setIsDemo]   = useState(false);
+
+  // Dynamic Time State
+  const [greeting, setGreeting] = useState(getGreetingMessage());
+  const [dateString, setDateString] = useState(getTodayString());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setGreeting(getGreetingMessage());
+      setDateString(getTodayString());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const [metricsLoading, setMetricsLoading] = useState(true);
+  const [dailyMetrics, setDailyMetrics] = useState<any[]>([]);
+  const [monthlyMetrics, setMonthlyMetrics] = useState<any[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  
+  // Edit modal state
+  const [isEditingMetrics, setIsEditingMetrics] = useState(false);
+  const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [editSales, setEditSales] = useState<string>('');
+  const [editExpense, setEditExpense] = useState<string>('');
+  const [editIphone, setEditIphone] = useState<string>('');
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    setIsDemo(false);
+    try {
+      const response = await dashboardService.getDashboardData(selectedDate.toISOString().split('T')[0]);
+      if (response) {
+        setData(response);
+      } else {
+        throw new Error('No data received');
+      }
+    } catch {
+      setData(DEMO_DATA);
+      setIsDemo(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMetrics = async () => {
+    try {
+      setMetricsLoading(true);
+      const d = new Date(selectedDate);
+      // Fetch for chart (last 7 days up to selected date)
+      const startDate = new Date(d);
+      startDate.setDate(startDate.getDate() - 6);
+      
+      const { metricsService } = await import('@/services/metrics');
+      const data = await metricsService.getMetrics(startDate.toISOString(), d.toISOString());
+      
+      // Fill missing days with empty values for the chart
+      const chart = [];
+      let todayMetric = null;
+      
+      for (let i = 6; i >= 0; i--) {
+        const iterDate = new Date(d);
+        iterDate.setDate(iterDate.getDate() - i);
+        const dateStr = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(iterDate);
+        const iterIso = iterDate.toISOString().split('T')[0];
+        
+        const existing = data.find((m: any) => m.date.startsWith(iterIso));
+        
+        if (i === 0) {
+          todayMetric = existing;
+        }
+        
+        chart.push({
+          date: dateStr,
+          totalSales: existing ? Number(existing.totalSales) : 0,
+          iphoneSales: existing ? Number(existing.totalIphoneSales) : 0,
+          expense: existing ? Number(existing.totalExpense) : 0,
+        });
+      }
+      
+      // Calculate last 6 months
+      const sixMonthsAgo = new Date(d);
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+      sixMonthsAgo.setDate(1); // Start of that month
+      
+      const monthlyData = await metricsService.getMetrics(sixMonthsAgo.toISOString(), d.toISOString());
+      
+      const monthlyMap = new Map();
+      
+      for (let i = 5; i >= 0; i--) {
+        const mDate = new Date(d);
+        mDate.setMonth(mDate.getMonth() - i);
+        const monthKey = new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format(mDate);
+        const shortMonth = new Intl.DateTimeFormat('en-IN', { month: 'short' }).format(mDate);
+        
+        monthlyMap.set(monthKey, {
+          name: shortMonth,
+          monthKey,
+          totalSales: 0,
+          iphoneSales: 0
+        });
+      }
+      
+      monthlyData.forEach((m: any) => {
+        const mDate = new Date(m.date);
+        const monthKey = new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format(mDate);
+        if (monthlyMap.has(monthKey)) {
+          const current = monthlyMap.get(monthKey);
+          current.totalSales += Number(m.totalSales || 0);
+          current.iphoneSales += Number(m.totalIphoneSales || 0);
+        }
+      });
+
+      setMonthlyMetrics(Array.from(monthlyMap.values()));
+      setDailyMetrics(chart);
+      
+      if (todayMetric) {
+        setEditSales(todayMetric.totalSales.toString());
+        setEditExpense(todayMetric.totalExpense.toString());
+        setEditIphone(todayMetric.totalIphoneSales.toString());
+      } else {
+        setEditSales('');
+        setEditExpense('');
+        setEditIphone('');
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setMetricsLoading(false);
+    }
+  };
+
+  const handleSaveMetrics = async () => {
+    try {
+      const { metricsService } = await import('@/services/metrics');
+      await metricsService.upsertMetric({
+        date: selectedDate.toISOString(),
+        totalSales: editSales ? Number(editSales) : 0,
+        totalExpense: editExpense ? Number(editExpense) : 0,
+        totalIphoneSales: editIphone ? Number(editIphone) : 0
+      });
+      setIsEditingMetrics(false);
+      fetchMetrics();
+    } catch (e) {
+      alert("Failed to save metrics");
+    }
+  };
+
+  useEffect(() => { 
+    fetchDashboardData(); 
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchMetrics();
+  }, [selectedDate]);
+
+  const todayData = dailyMetrics.length > 0 ? dailyMetrics[dailyMetrics.length - 1] : null;
+  const hasTodayData = todayData && (todayData.totalSales > 0 || todayData.expense > 0 || todayData.iphoneSales > 0);
+
+  if (loading || metricsLoading) return <DashboardSkeleton />;
+  if (!data)   return null;
+
+  const { metrics, recentBills, recentPayments } = data;
+  const activeBills = metrics.unpaidBillsCount + metrics.partiallyPaidBillsCount;
+
+  const creditChartData = [
+    {
+      name: 'Outstanding',
+      amount: typeof metrics.totalOutstandingCredit === 'string'
+        ? parseFloat(metrics.totalOutstandingCredit)
+        : Number(metrics.totalOutstandingCredit),
+    },
+    {
+      name: 'Overdue',
+      amount: typeof metrics.overdueAmount === 'string'
+        ? parseFloat(metrics.overdueAmount)
+        : Number(metrics.overdueAmount),
+    },
+  ];
+
+  const outstandingCustomers: Customer[] = isDemo ? DEMO_CUSTOMERS : [];
+
+  return (
+    <div className="space-y-8 pb-10">
+      
+      {/* ── Page Header ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <div className="mb-1">
+            <span className="inline-block text-sm font-semibold text-gray-700 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-300 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800/50 shadow-sm">{businessName}</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-100 tracking-tight">
+            {greeting}, Welcome back!
+          </h1>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{dateString}</p>
+        </div>
+        {/* Quick Actions */}
+        <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => setIsReportsOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors shadow-sm"
+          >
+            <FileText className="h-4 w-4 text-gray-500" />
+            Reports
+          </button>
+          <Link
+            to="/customers"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors shadow-sm"
+          >
+            <Users className="h-4 w-4 text-gray-500" />
+            Add Customer
+          </Link>
+          <Link
+            to="/bills"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors shadow-sm"
+          >
+            <FileText className="h-4 w-4 text-gray-500" />
+            Create Bill
+          </Link>
+          <Link
+            to="/payments"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-sm font-medium transition-colors shadow-sm"
+          >
+            <Plus className="h-4 w-4" />
+            Record Payment
+          </Link>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* SECTION B — Daily Business Overview */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold text-gray-900">Daily Business Overview</h2>
+          </div>
+          <div className="flex flex-row flex-wrap items-center gap-2">
+            <input 
+              type="date" 
+              className="px-3 py-2 sm:py-1.5 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 rounded-xl text-sm"
+              value={selectedDate.toISOString().split('T')[0]}
+              onChange={(e) => {
+                if (e.target.value) setSelectedDate(new Date(e.target.value));
+              }}
+            />
+            <button 
+              onClick={() => setIsEditingMetrics(true)}
+              className="px-3 py-2 sm:py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm text-center"
+            >
+              {hasTodayData ? 'Edit Metrics' : 'Add Metrics'}
+            </button>
+          </div>
+        </div>
+        
+        {hasTodayData ? (
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+            <MetricCard
+              title="Sales"
+              value={formatCurrency(todayData?.totalSales ?? 0)}
+              subtext="Total revenue"
+              icon={<ShoppingBag className="h-5 w-5" />}
+              iconBg="bg-indigo-50"
+              iconColor="text-indigo-600"
+            />
+            <MetricCard
+              title="Expense"
+              value={formatCurrency(todayData?.expense ?? 0)}
+              subtext="Total expenses"
+              icon={<CreditCard className="h-5 w-5" />}
+              iconBg="bg-rose-50"
+              iconColor="text-rose-600"
+            />
+            <MetricCard
+              title="iPhone Sales"
+              value={formatCurrency(todayData?.iphoneSales ?? 0)}
+              subtext="iPhone revenue"
+              icon={<Smartphone className="h-5 w-5" />}
+              iconBg="bg-emerald-50"
+              iconColor="text-emerald-600"
+            />
+          </div>
+        ) : (
+          <div className="bg-gray-50 rounded-xl border border-dashed border-gray-200 p-8 text-center">
+            <p className="text-sm font-medium text-gray-900">No entry yet</p>
+            <p className="text-xs text-gray-500 mt-1 mb-4">You haven't recorded business metrics for this date.</p>
+            <button 
+              onClick={() => setIsEditingMetrics(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-indigo-600 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              <Plus className="h-4 w-4" /> Add Entry
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* SECTION C — Last 10 Days Chart */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      <section>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Last 7 Days — Sales Overview</h3>
+          </div>
+          <div className="h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={dailyMetrics} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#6b7280', fontSize: 12 }} 
+                  dy={10} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
+                  dx={-10}
+                />
+                <Tooltip
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any, name: any) => [formatCurrency(value ?? 0), name]}
+                  contentStyle={{ borderRadius: '10px', border: '1px solid #e5e7eb', fontSize: '13px' }}
+                />
+                <Legend 
+                  iconType="circle"
+                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px', color: '#374151' }}
+                />
+                <Line 
+                  type="monotone" 
+                  name="Total Sales" 
+                  dataKey="totalSales" 
+                  stroke="#3B5B8A" 
+                  strokeWidth={3} 
+                  dot={{ r: 4, strokeWidth: 2 }}
+                  activeDot={{ r: 6 }} 
+                />
+                <Line 
+                  type="monotone" 
+                  name="iPhone 18 Sales" 
+                  dataKey="iphoneSales" 
+                  stroke="#F2B33D" 
+                  strokeWidth={3} 
+                  dot={{ r: 4, strokeWidth: 2 }}
+                  activeDot={{ r: 6 }} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================================================= */}
+      {/* SECTION - Monthly Sales Overview */}
+      {/* ================================================================================================= */}
+      <section className="pt-4">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Monthly Sales Overview</h3>
+          </div>
+          <div className="h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyMetrics} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#6b7280', fontSize: 12 }} 
+                  dy={10} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
+                  dx={-10}
+                />
+                <Tooltip
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any, name: any) => [formatCurrency(value ?? 0), name]}
+                  contentStyle={{ borderRadius: '10px', border: '1px solid #e5e7eb', fontSize: '13px' }}
+                />
+                <Legend 
+                  iconType="circle"
+                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px', color: '#374151' }}
+                />
+                <Bar 
+                  name="Total Sales" 
+                  dataKey="totalSales" 
+                  fill="#3B5B8A" 
+                  radius={[4, 4, 0, 0]} 
+                  maxBarSize={60} 
+                />
+                <Bar 
+                  name="iPhone Sales" 
+                  dataKey="iphoneSales" 
+                  fill="#F2B33D" 
+                  radius={[4, 4, 0, 0]} 
+                  maxBarSize={60} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* SECTION D — Existing Credit Management */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      <section className="pt-4 space-y-6">
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-xl font-bold text-gray-900">Credit Management</h2>
+          {isDemo && (
+            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+               <AlertTriangle className="h-4 w-4 text-amber-600" />
+               <p className="text-xs font-semibold text-amber-800">Preview Mode (No Database)</p>
+            </div>
+          )}
+        </div>
+
+        {/* Credit Overview Cards */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            title="Total Outstanding"
+            value={formatCurrency(metrics.totalOutstandingCredit)}
+            subtext="Total unpaid credit"
+            icon={<Wallet className="h-5 w-5" />}
+            iconBg="bg-red-50"
+            iconColor="text-red-500"
+            valueColor="text-red-600"
+          />
+          <MetricCard
+            title="Overdue Amount"
+            value={formatCurrency(metrics.overdueAmount)}
+            subtext="Past due date"
+            icon={<AlertTriangle className="h-5 w-5" />}
+            iconBg={Number(metrics.overdueAmount) > 0 ? 'bg-red-50' : 'bg-gray-50'}
+            iconColor={Number(metrics.overdueAmount) > 0 ? 'text-red-500' : 'text-gray-400'}
+            valueColor={Number(metrics.overdueAmount) > 0 ? 'text-red-600' : 'text-gray-900'}
+          />
+          <MetricCard
+            title="Active Bills"
+            value={activeBills.toString()}
+            subtext="Unpaid or partial"
+            icon={<FileText className="h-5 w-5" />}
+            iconBg="bg-amber-50"
+            iconColor="text-amber-500"
+          />
+          <MetricCard
+            title="Total Customers"
+            value={metrics.totalCustomers.toString()}
+            subtext="Registered customers"
+            icon={<Users className="h-5 w-5" />}
+            iconBg="bg-indigo-50"
+            iconColor="text-indigo-500"
+          />
+        </div>
+
+        {/* Chart + Recent Activity */}
+        <div className="grid gap-6 lg:grid-cols-7">
+          {/* Bar Chart */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-gray-100 shadow-sm p-6 min-w-0">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Credit Summary</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Outstanding vs Overdue</p>
+              </div>
+              <TrendingUp className="h-5 w-5 text-gray-300" />
+            </div>
+            <div className="h-[240px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={creditChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={8} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} dx={-4} width={52} />
+                  <Tooltip
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    formatter={(v: any) => [formatCurrency(v ?? 0), '']}
+                    cursor={{ fill: '#f9fafb' }}
+                    contentStyle={{ borderRadius: '10px', border: '1px solid #e5e7eb', fontSize: '13px' }}
+                  />
+                  <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={80}>
+                    {creditChartData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? '#3B5B8A' : '#F2B33D'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="lg:col-span-3 bg-white rounded-xl border border-gray-100 shadow-sm p-6 min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 mb-5">Recent Activity</h3>
+            {recentPayments.length === 0 && recentBills.length === 0 ? (
+              <EmptyActivity />
+            ) : (
+              <div className="space-y-4">
+                {recentPayments.slice(0, 3).map((payment) => (
+                  <ActivityRow
+                    key={`pay-${payment.id}`}
+                    iconBg="bg-emerald-50"
+                    icon={<ArrowUpRight className="h-3.5 w-3.5 text-emerald-600" />}
+                    title="Payment received"
+                    sub={`${payment.customer?.name} · ${formatDate(payment.paymentDate)}`}
+                    right={<span className="text-sm font-semibold text-emerald-600">+{formatCurrency(payment.amount)}</span>}
+                  />
+                ))}
+                {recentBills.slice(0, 3).map((bill) => (
+                  <ActivityRow
+                    key={`bill-${bill.id}`}
+                    iconBg="bg-indigo-50"
+                    icon={<FileText className="h-3.5 w-3.5 text-indigo-600" />}
+                    title={`Bill #${bill.billNumber}`}
+                    sub={`${bill.customer?.name} · ${formatDate(bill.billDate)}`}
+                    right={
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-gray-900">{formatCurrency(bill.totalAmount)}</div>
+                        <BillStatusBadge status={bill.status} />
+                      </div>
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Credit Bills Table */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-gray-900">Credit Bills ({selectedDate.toISOString().split('T')[0]})</h3>
+            <Link to="/bills" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+              View all →
+            </Link>
+          </div>
+
+          {recentBills.length === 0 ? (
+            <div className="px-6 py-14 text-center">
+              <FileText className="h-10 w-10 text-gray-200 mx-auto mb-3" />
+              <p className="text-sm font-medium text-gray-900">No bills found</p>
+              <p className="text-xs text-gray-500 mt-1 mb-4">There are no credit bills recorded for {selectedDate.toISOString().split('T')[0]}.</p>
+              <Link to="/bills" className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors">
+                <Plus className="h-4 w-4" /> Create Bill
+              </Link>
+            </div>
+          ) : (
+            <>
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto pb-1">
+                <table className="w-full min-w-full text-sm text-left whitespace-nowrap">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bill #</th>
+                      <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                      <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bill Date</th>
+                      <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Due Date</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Outstanding</th>
+                      <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {recentBills.slice(0, 6).map((bill) => (
+                      <tr key={bill.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-4 font-medium">
+                          <Link to={`/bills/${bill.id}`} className="text-indigo-600 hover:underline">#{bill.billNumber}</Link>
+                        </td>
+                        <td className="px-6 py-4 text-gray-900">{bill.customer?.name || '-'}</td>
+                        <td className="px-6 py-4 text-gray-500">{formatDate(bill.billDate)}</td>
+                        <td className="px-6 py-4 text-gray-500">{bill.dueDate ? formatDate(bill.dueDate) : '-'}</td>
+                        <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(bill.totalAmount)}</td>
+                        <td className={cn("px-6 py-4 text-right font-semibold", Number(bill.remainingAmount) > 0 ? "text-red-600" : "text-emerald-600")}>
+                          {formatCurrency(bill.remainingAmount ?? 0)}
+                        </td>
+                        <td className="px-6 py-4"><BillStatusBadge status={bill.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="md:hidden divide-y divide-gray-100">
+                {recentBills.slice(0, 5).map((bill) => (
+                  <Link key={bill.id} to={`/bills/${bill.id}`} className="flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-indigo-600">#{bill.billNumber}</p>
+                      <p className="text-xs text-gray-700 mt-0.5 truncate">{bill.customer?.name}</p>
+                      <p className="text-xs text-gray-400">{formatDate(bill.billDate)}</p>
+                    </div>
+                    <div className="text-right ml-3 flex-shrink-0">
+                      <p className={cn("text-sm font-bold", Number(bill.remainingAmount) > 0 ? "text-red-600" : "text-emerald-600")}>
+                        {formatCurrency(bill.remainingAmount ?? 0)}
+                      </p>
+                      <div className="mt-1"><BillStatusBadge status={bill.status} /></div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Recent Payments */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-gray-900">Recent Payments</h3>
+            <Link to="/payments" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+              View all →
+            </Link>
+          </div>
+          {recentPayments.length === 0 ? (
+            <div className="px-6 py-10 text-center">
+              <ArrowUpRight className="h-8 w-8 text-gray-200 mx-auto mb-2" />
+              <p className="text-sm text-gray-400">No payments recorded yet.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {recentPayments.slice(0, 5).map((payment) => (
+                <div key={payment.id} className="flex items-center justify-between px-6 py-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{payment.customer?.name || '—'}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {formatDate(payment.paymentDate)}
+                      {payment.creditBill?.billNumber && ` · Bill #${payment.creditBill.billNumber}`}
+                    </p>
+                  </div>
+                  <div className="ml-4 flex-shrink-0 text-right">
+                    <p className="text-sm font-semibold text-emerald-600">+{formatCurrency(payment.amount)}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 capitalize">{payment.paymentMethod?.replace(/_/g, ' ')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Outstanding Customers */}
+        {outstandingCustomers.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex flex-row flex-wrap items-center gap-2">
+                <h3 className="text-base font-semibold text-gray-900">Outstanding Customers</h3>
+                {isDemo && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">
+                    SAMPLE
+                  </span>
+                )}
+              </div>
+              <Link to="/customers" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+                View all →
+              </Link>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {outstandingCustomers.map((customer) => (
+                <div key={customer.id} className="flex items-center justify-between px-6 py-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{customer.name}</p>
+                    {customer.phone && <p className="text-xs text-gray-400 mt-0.5">{customer.phone}</p>}
+                  </div>
+                  <div className="ml-4 flex items-center gap-4 flex-shrink-0">
+                    <span className="text-sm font-bold text-red-600">
+                      {formatCurrency(customer.outstandingBalance ?? 0)}
+                    </span>
+                    <Link
+                      to={`/customers/${customer.id}`}
+                      className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                    >
+                      <Eye className="h-3.5 w-3.5" /> View
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </section>
+
+      {/* Edit Metrics Modal */}
+      {isEditingMetrics && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Business Metrics for {selectedDate.toISOString().split('T')[0]}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Total Sales</label>
+                <input 
+                  type="number" 
+                  value={editSales} 
+                  onChange={e => setEditSales(e.target.value)} 
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none" 
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Total Expense</label>
+                <input 
+                  type="number" 
+                  value={editExpense} 
+                  onChange={e => setEditExpense(e.target.value)} 
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none" 
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Total iPhone Sales</label>
+                <input 
+                  type="number" 
+                  value={editIphone} 
+                  onChange={e => setEditIphone(e.target.value)} 
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none" 
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button 
+                onClick={() => setIsEditingMetrics(false)} 
+                className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSaveMetrics} 
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ReportsModal open={isReportsOpen} onClose={() => setIsReportsOpen(false)} />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface MetricCardProps {
+  title: string;
+  value: string;
+  subtext: string;
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+  valueColor?: string;
+}
+
+function MetricCard({ title, value, subtext, icon, iconBg, iconColor, valueColor }: MetricCardProps) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <div className="flex items-start justify-between mb-3">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{title}</p>
+        <div className={cn("h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0", iconBg)}>
+          <span className={iconColor}>{icon}</span>
+        </div>
+      </div>
+      <div className={cn("text-2xl font-bold tracking-tight", valueColor ?? "text-gray-900")}>
+        {value}
+      </div>
+      <p className="mt-1 text-xs text-gray-400">{subtext}</p>
+    </div>
+  );
+}
+
+function ActivityRow({
+  iconBg, icon, title, sub, right,
+}: {
+  iconBg: string; icon: React.ReactNode; title: string; sub: string; right: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className={cn("h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5", iconBg)}>
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 truncate">{title}</p>
+        <p className="text-xs text-gray-500 truncate">{sub}</p>
+      </div>
+      <div className="flex-shrink-0">{right}</div>
+    </div>
+  );
+}
+
+function BillStatusBadge({ status }: { status?: BillStatus }) {
+  if (!status) return null;
+  switch (status) {
+    case 'PAID': return <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-700">PAID</span>;
+    case 'PARTIALLY_PAID': return <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700">PARTIAL</span>;
+    case 'OVERDUE': return <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">OVERDUE</span>;
+    default: return <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-600">UNPAID</span>;
+  }
+}
+
+function EmptyActivity() {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <div className="h-12 w-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+        <FileText className="h-6 w-6 text-gray-300" />
+      </div>
+      <p className="text-sm font-medium text-gray-900">No recent activity</p>
+      <p className="text-xs text-gray-500 mt-1">Create a bill or record a payment to get started.</p>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex justify-between items-center">
+        <div>
+          <div className="h-4 bg-gray-100 rounded w-36 mb-2" />
+          <div className="h-8 bg-gray-200 rounded w-52 mb-1" />
+          <div className="h-4 bg-gray-100 rounded w-64" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-9 bg-gray-200 rounded-xl w-32" />
+          <div className="h-9 bg-gray-200 rounded-xl w-32" />
+          <div className="h-9 bg-indigo-200 rounded-xl w-36" />
+        </div>
+      </div>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-xl border border-gray-100 p-5 h-28">
+            <div className="h-3 bg-gray-100 rounded w-20 mb-3" />
+            <div className="h-7 bg-gray-100 rounded w-28 mb-2" />
+            <div className="h-3 bg-gray-100 rounded w-16" />
+          </div>
+        ))}
+      </div>
+      <div className="h-[320px] bg-white rounded-xl border border-gray-100 p-6 opacity-50" />
+      <div className="grid gap-6 lg:grid-cols-7">
+        <div className="lg:col-span-4 bg-white rounded-xl border border-gray-100 h-[320px]" />
+        <div className="lg:col-span-3 bg-white rounded-xl border border-gray-100 h-[320px]" />
+      </div>
+    </div>
+  );
+}

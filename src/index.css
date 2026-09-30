@@ -1,0 +1,231 @@
+/* ============================================================
+   Tailwind CSS v4 — Credit Manager
+   
+   ROOT CAUSE FIX (was breaking all styling):
+   - Old file used @tailwind base/components/utilities (v3 syntax)
+   - Tailwind v4 requires @import "tailwindcss"
+   - Old tailwind.config.js (v3 format) is ignored by v4
+   - Theme tokens must be declared here with @theme
+   
+   Additionally: Shadcn UI components use CSS variable names like
+   --primary, --background, --input etc. We declare those as standard
+   CSS vars and map them into Tailwind v4's color system via @theme inline.
+   ============================================================ */
+
+@import "tailwindcss";
+
+/* Force class-based dark mode instead of media query */
+@custom-variant dark (&:is(.dark *));
+
+
+/* ── Shadcn-compatible CSS variables (light mode) ───────── */
+@layer base {
+  :root {
+    --background:          210 20% 98%;
+    --foreground:          209 23% 28%;
+    --card:                0 0% 100%;
+    --card-foreground:     209 23% 28%;
+    --popover:             0 0% 100%;
+    --popover-foreground:  209 23% 28%;
+    --primary:             239 84% 57%;        /* Indigo-600 */
+    --primary-foreground:  210 40% 98%;
+    --secondary:           210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted:               210 40% 96%;
+    --muted-foreground:    215 16% 47%;
+    --accent:              210 40% 96%;
+    --accent-foreground:   222 47% 11%;
+    --destructive:         0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border:              214 32% 91%;
+    --input:               214 32% 91%;
+    --ring:                239 84% 57%;
+    --radius:              0.5rem;
+  }
+}
+
+/* ── Map CSS vars into Tailwind v4 color tokens ─────────── */
+/*
+   This @theme inline block lets Tailwind v4 generate utility classes
+   (bg-primary, text-primary-foreground, border-input, etc.) that
+   the Shadcn UI components depend on.
+*/
+@theme inline {
+  --color-background:             hsl(var(--background));
+  --color-foreground:             hsl(var(--foreground));
+  --color-card:                   hsl(var(--card));
+  --color-card-foreground:        hsl(var(--card-foreground));
+  --color-popover:                hsl(var(--popover));
+  --color-popover-foreground:     hsl(var(--popover-foreground));
+  --color-primary:                hsl(var(--primary));
+  --color-primary-foreground:     hsl(var(--primary-foreground));
+  --color-secondary:              hsl(var(--secondary));
+  --color-secondary-foreground:   hsl(var(--secondary-foreground));
+  --color-muted:                  hsl(var(--muted));
+  --color-muted-foreground:       hsl(var(--muted-foreground));
+  --color-accent:                 hsl(var(--accent));
+  --color-accent-foreground:      hsl(var(--accent-foreground));
+  --color-destructive:            hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border:                 hsl(var(--border));
+  --color-input:                  hsl(var(--input));
+  --color-ring:                   hsl(var(--ring));
+
+  /* Border radius tokens */
+  --radius-sm:   calc(var(--radius) - 4px);
+  --radius-md:   calc(var(--radius) - 2px);
+  --radius-lg:   var(--radius);
+  --radius-xl:   calc(var(--radius) + 4px);
+  --radius-2xl:  calc(var(--radius) + 8px);
+}
+
+/* ── Additional brand tokens ─────────────────────────────── */
+@theme {
+  /* Inter — loaded from Google Fonts in index.html */
+  --font-sans: "Inter", "ui-sans-serif", "system-ui", "-apple-system",
+    "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial",
+    sans-serif;
+}
+
+/* ── Base resets ─────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color:            hsl(var(--foreground));
+    font-family:      var(--font-sans);
+    font-size:        16px;
+    line-height:      1.6;
+    margin:           0;
+    -webkit-font-smoothing:   antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    line-height: 1.25;
+    margin:      0;
+    /* Override any browser default serif */
+    color: hsl(var(--foreground));
+  }
+
+  p { margin: 0; }
+
+  /* Remove browser default form styles */
+  input, textarea, select, button {
+    font-family: var(--font-sans);
+    font-size:   inherit;
+  }
+
+  a {
+    color:           inherit;
+    text-decoration: none;
+  }
+
+  button { cursor: pointer; }
+}
+
+/* STORMY MORNING THEME TOKENS */
+@theme {
+  /* Slate/Blue Neutral */
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f0f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #384959; /* Dark Slate (used for surfaces) */
+  --color-gray-800: #25333f;
+  --color-gray-900: #1b2631; /* Deepest slate */
+  --color-gray-950: #0f172a;
+
+  /* Primary Accent (Stormy Blue) */
+  --color-indigo-50: #f2f7fc;
+  --color-indigo-100: #e0f0fd;
+  --color-indigo-200: #bdddfc; /* Light Blue */
+  --color-indigo-300: #a3cdfa;
+  --color-indigo-400: #88bdf2; /* Accent Blue */
+  --color-indigo-500: #71a5d4;
+  --color-indigo-600: #6a89a7; /* Primary Slate Blue */
+  --color-indigo-700: #4d7191;
+  --color-indigo-800: #355370;
+  --color-indigo-900: #233a52;
+  --color-indigo-950: #152434;
+}
+/* Unified Dark Mode Overrides */
+.dark .bg-white { background-color: var(--color-gray-800) !important; border-color: var(--color-gray-800) !important; }
+.dark .bg-gray-50, .dark .bg-slate-50 { background-color: var(--color-gray-900) !important; }
+.dark .text-gray-900 { color: var(--color-gray-50) !important; }
+.dark .text-gray-800 { color: var(--color-gray-100) !important; }
+.dark .text-gray-700 { color: var(--color-gray-200) !important; }
+.dark .text-gray-600 { color: var(--color-gray-300) !important; }
+.dark .text-gray-500 { color: var(--color-gray-400) !important; }
+.dark .text-gray-400 { color: var(--color-gray-500) !important; }
+
+.dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300 { border-color: var(--color-gray-800) !important; }
+.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]), 
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-gray-800) !important; }
+
+.dark .hover\:bg-gray-50:hover { background-color: var(--color-gray-800) !important; }
+.dark .hover\:bg-gray-100:hover { background-color: var(--color-gray-700) !important; }
+.dark .bg-gray-100 { background-color: var(--color-gray-800) !important; }
+.dark .bg-gray-50\/50 { background-color: var(--color-gray-800) !important; }
+.dark .hover\:bg-gray-50\/50:hover { background-color: var(--color-gray-800) !important; }
+
+.dark input, .dark select, .dark textarea { background-color: var(--color-gray-900) !important; color: var(--color-gray-50) !important; border-color: var(--color-gray-800) !important; }
+.dark input::placeholder, .dark textarea::placeholder { color: var(--color-gray-500) !important; }
+.dark input:disabled, .dark select:disabled, .dark textarea:disabled { background-color: var(--color-gray-800) !important; color: var(--color-gray-500) !important; opacity: 0.7; }
+
+.dark .bg-indigo-50 { background-color: rgba(106, 137, 167, 0.15) !important; }
+.dark .text-indigo-600 { color: var(--color-indigo-400) !important; }
+.dark .text-indigo-700 { color: var(--color-indigo-300) !important; }
+.dark .text-indigo-800 { color: var(--color-indigo-200) !important; }
+.dark .border-indigo-100 { border-color: rgba(106, 137, 167, 0.25) !important; }
+.dark .hover\:text-indigo-800:hover { color: var(--color-indigo-100) !important; }
+
+.dark .text-emerald-600 { color: #34D399 !important; }
+.dark .text-emerald-800 { color: #6ee7b7 !important; }
+.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.2) !important; }
+
+.dark .text-amber-800 { color: #fcd34d !important; }
+.dark .bg-amber-100 { background-color: rgba(245, 158, 11, 0.2) !important; }
+
+.dark .text-red-600 { color: #F87171 !important; }
+.dark .text-red-800 { color: #fca5a5 !important; }
+.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
+
+.dark .shadow-sm, .dark .shadow-md, .dark .shadow-lg, .dark .shadow-xl { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important; }
+
+/* Recharts Dark Mode Overrides */
+.dark .recharts-default-tooltip { background-color: var(--color-gray-900) !important; border: 1px solid var(--color-gray-800) !important; color: var(--color-gray-100) !important; }
+.dark .recharts-tooltip-item { color: var(--color-gray-100) !important; }
+.dark .recharts-cartesian-grid-horizontal line, .dark .recharts-cartesian-grid-vertical line { stroke: var(--color-gray-800); }
+.dark .recharts-text { fill: var(--color-gray-400); }
+.dark .recharts-rectangle.recharts-tooltip-cursor { fill: var(--color-gray-800) !important; }
+
+
+/* Ensure sufficient contrast on Primary Buttons (#6A89A7) */
+.bg-indigo-600 {
+  color: var(--color-gray-950) !important;
+}
+.hover\:bg-indigo-700:hover {
+  color: var(--color-gray-50) !important; /* #4d7191 is darker, white text works */
+}
+.dark .bg-indigo-600 {
+  color: var(--color-gray-950) !important;
+}
+.dark .hover\:bg-indigo-700:hover {
+  color: var(--color-gray-50) !important;
+}
