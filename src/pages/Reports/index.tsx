@@ -362,7 +362,7 @@ export default function ReportsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topDebtors} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={isDark ? '#3C3633' : '#f3f4f6'} />
-                  <XAxis type="number" tickFormatter={(v) => `ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹${v}`} axisLine={false} tickLine={false} tick={{fill: isDark ? '#9E9685' : '#6b7280', fontSize: 12}} />
+                  <XAxis type="number" tickFormatter={(v: any) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} tick={{fill: isDark ? '#9E9685' : '#6b7280', fontSize: 12}} />
                   <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={80} tick={{fill: isDark ? '#E0D8CA' : '#4b5563', fontSize: 12}} />
                   <Tooltip 
                     formatter={(value: any) => formatCurrency(value)}

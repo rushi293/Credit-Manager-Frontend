@@ -90,7 +90,7 @@ export default function SettingsPage() {
                   className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm text-gray-500 cursor-not-allowed sm:text-sm"
                   disabled
                 >
-                  <option value="INR">â‚¹ INR (Indian Rupee)</option>
+                  <option value="INR">₹ INR (Indian Rupee)</option>
                 </select>
                 <p className="text-xs text-gray-500">Currency is fixed for this region.</p>
               </div>

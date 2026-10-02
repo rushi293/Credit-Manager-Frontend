@@ -19,7 +19,6 @@ import { SSEProvider } from '@/components/SSEProvider';
 
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// AUTH BYPASS â€” LOCAL DEVELOPMENT PREVIEW MODE
 //
 // When VITE_AUTH_BYPASS=true is set in .env.local the app skips the login
 // screen so you can browse all pages without a running backend / database.

@@ -435,7 +435,7 @@ export default function Dashboard() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#6b7280', fontSize: 12 }}
-                  tickFormatter={(v) => `ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                   dx={-10}
                 />
                 <Tooltip
@@ -494,7 +494,7 @@ export default function Dashboard() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#6b7280', fontSize: 12 }}
-                  tickFormatter={(v) => `ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                   dx={-10}
                 />
                 <Tooltip
@@ -594,7 +594,7 @@ export default function Dashboard() {
                 <BarChart data={creditChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={8} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={(v) => `ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹${(v / 1000).toFixed(0)}k`} dx={-4} width={52} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} dx={-4} width={52} />
                   <Tooltip
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(v: any) => [formatCurrency(v ?? 0), '']}
@@ -653,7 +653,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900">Credit Bills ({selectedDate.toISOString().split('T')[0]})</h3>
             <Link to="/bills" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-              View all ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢
+              View all →
             </Link>
           </div>
 
@@ -729,7 +729,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900">Recent Payments</h3>
             <Link to="/payments" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-              View all ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢
+              View all →
             </Link>
           </div>
           {recentPayments.length === 0 ? (
@@ -742,10 +742,10 @@ export default function Dashboard() {
               {recentPayments.slice(0, 5).map((payment) => (
                 <div key={payment.id} className="flex items-center justify-between px-6 py-4">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{payment.customer?.name || 'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â'}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{payment.customer?.name || 'Unknown'}</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {formatDate(payment.paymentDate)}
-                      {payment.creditBill?.billNumber && ` ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Bill #${payment.creditBill.billNumber}`}
+                      {payment.creditBill?.billNumber && ` • Bill #${payment.creditBill.billNumber}`}
                     </p>
                   </div>
                   <div className="ml-4 flex-shrink-0 text-right">
@@ -771,7 +771,7 @@ export default function Dashboard() {
                 )}
               </div>
               <Link to="/customers" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-                View all ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢
+                View all →
               </Link>
             </div>
             <div className="divide-y divide-gray-50">

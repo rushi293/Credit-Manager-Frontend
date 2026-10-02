@@ -128,7 +128,7 @@ export default function LoginPage() {
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in…
+                  Signing in...
                 </span>
               ) : (
                 'Sign In'
