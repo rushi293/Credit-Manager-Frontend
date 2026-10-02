@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -54,6 +55,15 @@ export default function NonAdminUserManagement() {
       fetchUsers();
     }
   }, [user]);
+
+  useAppEvent(
+    ['USER_CREATED', 'USER_UPDATED', 'USER_DELETED', 'RECONNECTED'],
+    () => {
+      if (user?.role === "ADMIN") {
+        fetchUsers();
+      }
+    }
+  );
 
   const onSubmit = async (data: z.infer<typeof staffSchema>) => {
     setIsSaving(true);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { Activity, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { adminService } from "@/services/admin";
@@ -27,6 +28,15 @@ export default function UserLoginActivity() {
       fetchSessions();
     }
   }, [user]);
+
+  useAppEvent(
+    ['USER_LOGIN', 'USER_LOGOUT', 'USER_UPDATED', 'USER_DELETED', 'RECONNECTED'],
+    () => {
+      if (user?.role === "ADMIN") {
+        fetchSessions();
+      }
+    }
+  );
 
   const onLogout = async () => {
     if (!loggingOutSession) return;

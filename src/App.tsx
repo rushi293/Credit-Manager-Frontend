@@ -15,15 +15,16 @@ import SettingsPage from '@/pages/Settings';
 import LoginPage from '@/pages/Auth/Login';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { OfflineDetector } from '@/components/pwa/OfflineDetector';
+import { SSEProvider } from '@/components/SSEProvider';
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AUTH BYPASS — LOCAL DEVELOPMENT PREVIEW MODE
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// AUTH BYPASS â€” LOCAL DEVELOPMENT PREVIEW MODE
 //
 // When VITE_AUTH_BYPASS=true is set in .env.local the app skips the login
 // screen so you can browse all pages without a running backend / database.
 //
-// ⚠️  This is a FRONTEND-ONLY convenience flag.
+// âš ï¸  This is a FRONTEND-ONLY convenience flag.
 //     Backend JWT middleware, IDOR protection, and business isolation are
 //     completely unchanged and still enforce auth on every API call.
 //
@@ -33,7 +34,7 @@ import { OfflineDetector } from '@/components/pwa/OfflineDetector';
 //   3. Restart the dev server (`npm run dev`)
 //
 // Production builds should NEVER have VITE_AUTH_BYPASS=true.
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const AUTH_BYPASS = import.meta.env.VITE_AUTH_BYPASS === 'true';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -50,7 +51,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm text-gray-500">Loading…</span>
+          <span className="text-sm text-gray-500">Loadingâ€¦</span>
         </div>
       </div>
     );
@@ -76,11 +77,11 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <ToastProvider>
-          {/* PWA offline banner — renders only when browser is offline */}
+          {/* PWA offline banner â€” renders only when browser is offline */}
           <OfflineDetector />
           <BrowserRouter>
             <Routes>
-              {/* Auth screens — hidden in bypass mode */}
+              {/* Auth screens â€” hidden in bypass mode */}
               <Route path="/login"    element={<AuthRoute element={<LoginPage />} />} />
 
               {/* Main application shell */}
@@ -88,7 +89,9 @@ function App() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <AppLayout />
+                    <SSEProvider>
+                      <AppLayout />
+                    </SSEProvider>
                   </ProtectedRoute>
                 }
               >

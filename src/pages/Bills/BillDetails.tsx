@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Receipt, CreditCard, AlertCircle, RefreshCw, Calendar, FileText, UploadCloud, Trash2, Edit2, Image as ImageIcon, CheckCircle2, Eye } from 'lucide-react';
 
@@ -111,6 +112,17 @@ export default function BillDetailsPage() {
   useEffect(() => {
     fetchBill();
   }, [id]);
+
+  useAppEvent(
+    [
+      'CREDIT_BILL_UPDATED', 'CREDIT_BILL_DELETED',
+      'PAYMENT_CREATED', 'PAYMENT_DELETED',
+      'RECONNECTED'
+    ],
+    () => {
+      fetchBill();
+    }
+  );
 
   if (loading) {
     return (
@@ -314,7 +326,7 @@ export default function BillDetailsPage() {
                       <div className="font-semibold text-gray-900">Payment Received</div>
                       <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                         <span>{formatDate(payment.paymentDate)}</span>
-                        <span>â€¢</span>
+                        <span>Ã¢â‚¬Â¢</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-200 text-gray-700 uppercase tracking-wider">{payment.paymentMethod}</span>
                       </div>
                       {payment.notes && <div className="text-sm text-gray-400 mt-1">{payment.notes}</div>}
