@@ -93,7 +93,7 @@ export default function BillDetailsPage() {
 
   const fetchBill = async () => {
     if (!id) return;
-    setLoading(true);
+    if (!bill) setLoading(true);
     setError(null);
     try {
       const data = await billService.getBillById(id);
@@ -326,7 +326,7 @@ export default function BillDetailsPage() {
                       <div className="font-semibold text-gray-900">Payment Received</div>
                       <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                         <span>{formatDate(payment.paymentDate)}</span>
-                        <span>Ã¢â‚¬Â¢</span>
+                        <span>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-200 text-gray-700 uppercase tracking-wider">{payment.paymentMethod}</span>
                       </div>
                       {payment.notes && <div className="text-sm text-gray-400 mt-1">{payment.notes}</div>}

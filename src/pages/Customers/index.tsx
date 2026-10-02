@@ -18,7 +18,7 @@ export default function CustomersPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const fetchCustomers = async () => {
-    setLoading(true);
+    if (customers.length === 0) setLoading(true);
     setError(null);
     try {
       const data = await customerService.getCustomers();

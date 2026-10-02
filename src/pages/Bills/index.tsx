@@ -1,3 +1,4 @@
+import { billService } from '@/services/bills';
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Receipt, AlertCircle, RefreshCw, Filter, ChevronRight } from 'lucide-react';
@@ -34,10 +35,10 @@ export default function BillsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const fetchBills = async () => {
-    setLoading(true);
+    if (bills.length === 0) setLoading(true);
     setError(null);
     try {
-      const { billService } = await import('@/services/bills');
+      
       const data = await billService.getBills(undefined, showArchived, statusFilter !== 'ALL' ? statusFilter : undefined);
       if (data) {
         setBills(data);

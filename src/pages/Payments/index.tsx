@@ -16,7 +16,7 @@ export default function PaymentsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const fetchPayments = async () => {
-    setLoading(true);
+    if (payments.length === 0) setLoading(true);
     setError(null);
     try {
       const data = await paymentService.getPayments();
