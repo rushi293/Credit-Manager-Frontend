@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { settingsService } from '@/services/settings';
 import AdminCredentials from './components/AdminCredentials';
 import NonAdminUserManagement from './components/NonAdminUserManagement';
+import UserLoginActivity from './components/UserLoginActivity';
 
 const settingsSchema = z.object({
   name: z.string().min(1, 'Business name is required'),
@@ -89,7 +90,7 @@ export default function SettingsPage() {
                   className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm text-gray-500 cursor-not-allowed sm:text-sm"
                   disabled
                 >
-                  <option value="INR">₹ INR (Indian Rupee)</option>
+                  <option value="INR">â‚¹ INR (Indian Rupee)</option>
                 </select>
                 <p className="text-xs text-gray-500">Currency is fixed for this region.</p>
               </div>
@@ -136,6 +137,7 @@ export default function SettingsPage() {
       </form>
 
       <AdminCredentials />
+      <UserLoginActivity />
       <NonAdminUserManagement />
     </div>
   );

@@ -15,9 +15,9 @@ import type { DashboardData, BillStatus, Customer } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // DEMO / PREVIEW DATA FOR CREDIT SECTION
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DEMO_DATA: DashboardData = {
   metrics: {
     totalCustomers: 8,
@@ -74,9 +74,9 @@ const DEMO_CUSTOMERS: Customer[] = [
   { id: 'c5', name: 'Arjun Singh', phone: '9611112222', alternatePhone: null, address: null, notes: null, createdAt: '', updatedAt: '', outstandingBalance: '9000' },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // TIME & DATE HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getGreetingMessage() {
   const h = new Date().getHours();
@@ -92,7 +92,7 @@ function getTodayString() {
   }).format(new Date());
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import { useAuth } from '@/context/AuthContext';
 import { ReportsModal } from './components/ReportsModal';
@@ -287,7 +287,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 pb-10">
       
-      {/* ── Page Header ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <div className="mb-1">
@@ -331,9 +331,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* SECTION B — Daily Business Overview */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* SECTION B â€” Daily Business Overview */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
@@ -376,9 +376,9 @@ export default function Dashboard() {
               iconColor="text-rose-600"
             />
             <MetricCard
-              title="iPhone Sales"
+              title="Ice Cream Sales"
               value={formatCurrency(todayData?.iphoneSales ?? 0)}
-              subtext="iPhone revenue"
+              subtext="Ice Cream revenue"
               icon={<Smartphone className="h-5 w-5" />}
               iconBg="bg-emerald-50"
               iconColor="text-emerald-600"
@@ -398,13 +398,13 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* SECTION C — Last 10 Days Chart */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* SECTION C â€” Last 10 Days Chart */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section>
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Last 7 Days — Sales Overview</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Last 7 Days â€” Sales Overview</h3>
           </div>
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -421,7 +421,7 @@ export default function Dashboard() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#6b7280', fontSize: 12 }}
-                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => `â‚¹${(v / 1000).toFixed(0)}k`}
                   dx={-10}
                 />
                 <Tooltip
@@ -444,7 +444,7 @@ export default function Dashboard() {
                 />
                 <Line 
                   type="monotone" 
-                  name="iPhone 18 Sales" 
+                  name="Ice Cream Sales" 
                   dataKey="iphoneSales" 
                   stroke="#F2B33D" 
                   strokeWidth={3} 
@@ -480,7 +480,7 @@ export default function Dashboard() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#6b7280', fontSize: 12 }}
-                  tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => `â‚¹${(v / 1000).toFixed(0)}k`}
                   dx={-10}
                 />
                 <Tooltip
@@ -500,7 +500,7 @@ export default function Dashboard() {
                   maxBarSize={60} 
                 />
                 <Bar 
-                  name="iPhone Sales" 
+                  name="Ice Cream Sales" 
                   dataKey="iphoneSales" 
                   fill="#F2B33D" 
                   radius={[4, 4, 0, 0]} 
@@ -512,9 +512,9 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* SECTION D — Existing Credit Management */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* SECTION D â€” Existing Credit Management */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section className="pt-4 space-y-6">
         <div className="flex items-center gap-3 mb-2">
           <h2 className="text-xl font-bold text-gray-900">Credit Management</h2>
@@ -580,7 +580,7 @@ export default function Dashboard() {
                 <BarChart data={creditChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={8} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} dx={-4} width={52} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={(v) => `â‚¹${(v / 1000).toFixed(0)}k`} dx={-4} width={52} />
                   <Tooltip
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(v: any) => [formatCurrency(v ?? 0), '']}
@@ -610,7 +610,7 @@ export default function Dashboard() {
                     iconBg="bg-emerald-50"
                     icon={<ArrowUpRight className="h-3.5 w-3.5 text-emerald-600" />}
                     title="Payment received"
-                    sub={`${payment.customer?.name} · ${formatDate(payment.paymentDate)}`}
+                    sub={`${payment.customer?.name} Â· ${formatDate(payment.paymentDate)}`}
                     right={<span className="text-sm font-semibold text-emerald-600">+{formatCurrency(payment.amount)}</span>}
                   />
                 ))}
@@ -620,7 +620,7 @@ export default function Dashboard() {
                     iconBg="bg-indigo-50"
                     icon={<FileText className="h-3.5 w-3.5 text-indigo-600" />}
                     title={`Bill #${bill.billNumber}`}
-                    sub={`${bill.customer?.name} · ${formatDate(bill.billDate)}`}
+                    sub={`${bill.customer?.name} Â· ${formatDate(bill.billDate)}`}
                     right={
                       <div className="text-right">
                         <div className="text-sm font-semibold text-gray-900">{formatCurrency(bill.totalAmount)}</div>
@@ -639,7 +639,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900">Credit Bills ({selectedDate.toISOString().split('T')[0]})</h3>
             <Link to="/bills" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-              View all →
+              View all â†’
             </Link>
           </div>
 
@@ -715,7 +715,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900">Recent Payments</h3>
             <Link to="/payments" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-              View all →
+              View all â†’
             </Link>
           </div>
           {recentPayments.length === 0 ? (
@@ -728,10 +728,10 @@ export default function Dashboard() {
               {recentPayments.slice(0, 5).map((payment) => (
                 <div key={payment.id} className="flex items-center justify-between px-6 py-4">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{payment.customer?.name || '—'}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{payment.customer?.name || 'â€”'}</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {formatDate(payment.paymentDate)}
-                      {payment.creditBill?.billNumber && ` · Bill #${payment.creditBill.billNumber}`}
+                      {payment.creditBill?.billNumber && ` Â· Bill #${payment.creditBill.billNumber}`}
                     </p>
                   </div>
                   <div className="ml-4 flex-shrink-0 text-right">
@@ -757,7 +757,7 @@ export default function Dashboard() {
                 )}
               </div>
               <Link to="/customers" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-                View all →
+                View all â†’
               </Link>
             </div>
             <div className="divide-y divide-gray-50">
@@ -815,7 +815,7 @@ export default function Dashboard() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Total iPhone Sales</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Total Ice Cream Sales</label>
                 <input 
                   type="number" 
                   value={editIphone} 
@@ -848,9 +848,9 @@ export default function Dashboard() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Sub-components
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface MetricCardProps {
   title: string;

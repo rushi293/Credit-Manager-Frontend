@@ -82,7 +82,7 @@ export function ReportsModal({ open, onClose }: ReportsModalProps) {
 
       autoTable(doc, {
         startY: 36,
-        head: [['Date', 'Total Sales', 'Total Expense', 'iPhone Sales']],
+        head: [['Date', 'Total Sales', 'Total Expense', 'Ice Cream Sales']],
         body: tableData,
         theme: 'striped',
         headStyles: { fillColor: [79, 70, 229] },
@@ -118,7 +118,7 @@ export function ReportsModal({ open, onClose }: ReportsModalProps) {
         </div>
         <div className="p-6 space-y-4">
           <p className="text-sm text-gray-500 mb-4">
-            Select a date range to generate a PDF report of your daily sales, expenses, and iPhone sales.
+            Select a date range to generate a PDF report of your daily sales, expenses, and Ice Cream Sales.
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
