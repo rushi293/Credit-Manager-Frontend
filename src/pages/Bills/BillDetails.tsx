@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Receipt, CreditCard, AlertCircle, RefreshCw, Calendar, FileText, UploadCloud, Trash2, Edit2, Image as ImageIcon, CheckCircle2, Eye } from 'lucide-react';
 
@@ -45,7 +45,7 @@ export default function BillDetailsPage() {
     if (!id) return;
     try {
       await billService.deleteBill(id);
-      toast.success("Archived bill permanently deleted.");
+      toast.success("Bill deleted successfully.");
       navigate('/bills', { replace: true });
     } catch (err: any) {
       toast.error(err?.response?.data?.error || "Failed to delete bill permanently.");
@@ -178,7 +178,15 @@ export default function BillDetailsPage() {
                 Edit Bill
               </button>
             )}
-            
+
+            <button
+              onClick={() => setPermanentDeleteConfirm(true)}
+              className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-sm font-medium transition-colors border border-red-200 shadow-sm flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Bill
+            </button>
+
             {isFullyPaid && !bill.isArchived && (
               <button
                 onClick={async () => {
@@ -195,16 +203,6 @@ export default function BillDetailsPage() {
                 className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors border border-gray-200 shadow-sm"
               >
                 Archive Bill
-              </button>
-            )}
-
-            {bill.isArchived && (
-              <button
-                onClick={() => setPermanentDeleteConfirm(true)}
-                className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-sm font-medium transition-colors border border-red-200 shadow-sm flex items-center gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete Permanently
               </button>
             )}
           </div>
@@ -316,7 +314,7 @@ export default function BillDetailsPage() {
                       <div className="font-semibold text-gray-900">Payment Received</div>
                       <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                         <span>{formatDate(payment.paymentDate)}</span>
-                        <span>•</span>
+                        <span>â€¢</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-200 text-gray-700 uppercase tracking-wider">{payment.paymentMethod}</span>
                       </div>
                       {payment.notes && <div className="text-sm text-gray-400 mt-1">{payment.notes}</div>}
@@ -466,9 +464,39 @@ export default function BillDetailsPage() {
 
       <ConfirmDialog
         open={permanentDeleteConfirm}
-        title="Permanently delete bill?"
-        description="This action cannot be undone. All associated payment history and attachments will also be permanently removed. Are you absolutely sure?"
-        confirmLabel="Delete Permanently"
+        title="Delete this credit bill?"
+        description={
+          bill ? (
+            <div className="space-y-3">
+              <div className="bg-gray-50 rounded-lg border border-gray-100 p-3 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Bill Number</span>
+                  <span className="font-medium text-gray-900">#{bill.billNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Customer</span>
+                  <span className="font-medium text-gray-900">{bill.customer?.name || 'Unknown'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Bill Amount</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(bill.totalAmount)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Paid Amount</span>
+                  <span className="font-medium text-emerald-600">{formatCurrency(bill.totalPaid)}</span>
+                </div>
+                <div className="flex justify-between border-t border-gray-200 pt-2">
+                  <span className="text-gray-500">Remaining</span>
+                  <span className="font-semibold text-red-600">{formatCurrency(bill.remainingAmount)}</span>
+                </div>
+              </div>
+              <p className="text-xs text-red-600 font-medium">
+                This action will permanently delete this credit bill and its related payment records. This cannot be undone.
+              </p>
+            </div>
+          ) : "This action cannot be undone."
+        }
+        confirmLabel="Delete Bill"
         cancelLabel="Cancel"
         onConfirm={handlePermanentDelete}
         onCancel={() => setPermanentDeleteConfirm(false)}

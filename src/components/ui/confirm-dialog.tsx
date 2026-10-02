@@ -3,7 +3,7 @@ import { AlertTriangle, X } from 'lucide-react';
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
-  description: string;
+  description: string | React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   onConfirm: () => void;
