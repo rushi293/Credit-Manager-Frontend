@@ -136,6 +136,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
     try {
       const payload = {
         ...data,
+        billDate: new Date(data.billDate).toISOString(),
         paymentMethod: (data.paymentMethod === '' ? null : data.paymentMethod) as any
       };
       
