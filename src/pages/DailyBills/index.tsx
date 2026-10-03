@@ -69,7 +69,7 @@ export default function DailyBillsPage() {
     }
   };
 
-  const totalAmount = bills.filter(b => b.status !== 'CREDIT_BILL').reduce((sum, b) => sum + Number(b.billAmount), 0);
+  const totalAmount = bills.reduce((sum, b) => sum + Number(b.billAmount), 0);
   const paidCount = bills.filter(b => b.status === 'PAID').length;
   const unpaidCount = bills.filter(b => b.status === 'UNPAID').length;
 
