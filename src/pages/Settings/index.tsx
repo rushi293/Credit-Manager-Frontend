@@ -6,6 +6,8 @@ import { Save, Building2, Store } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/context/AuthContext';
 import { settingsService } from '@/services/settings';
+import { authService } from '@/services/auth';
+import { useAppEvent } from '@/hooks/useAppEvent';
 import AdminCredentials from './components/AdminCredentials';
 import NonAdminUserManagement from './components/NonAdminUserManagement';
 import UserLoginActivity from './components/UserLoginActivity';
@@ -38,6 +40,17 @@ export default function SettingsPage() {
       });
     }
   }, [business, reset]);
+
+  useAppEvent(['SETTINGS_UPDATED'], async () => {
+    try {
+      const data = await authService.getMe();
+      if (data && token) {
+        login(token, data.user, data.business);
+      }
+    } catch (err) {
+      console.error('Failed to refresh settings', err);
+    }
+  });
 
   const onSubmit = async (data: SettingsFormValues) => {
     setIsSaving(true);

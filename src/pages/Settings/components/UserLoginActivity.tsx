@@ -81,7 +81,8 @@ export default function UserLoginActivity() {
               {sessions.map((s) => {
                 // Calculate if session is realistically active based on 18h limit + revocation
                 const is18hPassed = (new Date().getTime() - new Date(s.loginAt).getTime()) > 18 * 60 * 60 * 1000;
-                const isOnline = s.isValid && !s.revokedAt && !is18hPassed;
+                const is8hStale = (new Date().getTime() - new Date(s.lastActivityAt || s.loginAt).getTime()) > 8 * 60 * 60 * 1000;
+                const isOnline = s.isValid && !s.revokedAt && !is18hPassed && !is8hStale;
 
                 return (
                   <tr key={s.id} className="hover:bg-gray-50 transition-colors">
