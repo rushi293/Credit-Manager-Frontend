@@ -20,6 +20,7 @@ export default function DailyBillsPage() {
   const [loading, setLoading] = useState(true);
   
   const [activeTab, setActiveTab] = useState<'ALL' | 'PAID' | 'REPORT'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBill, setEditingBill] = useState<DailyBill | undefined>();
@@ -66,9 +67,11 @@ export default function DailyBillsPage() {
     }
   };
 
-  const totalAmount = bills.reduce((sum, b) => sum + Number(b.billAmount), 0);
+  const totalAmount = bills.filter(b => b.status !== 'CREDIT_BILL').reduce((sum, b) => sum + Number(b.billAmount), 0);
   const paidCount = bills.filter(b => b.status === 'PAID').length;
   const unpaidCount = bills.filter(b => b.status === 'UNPAID').length;
+
+  const filteredBills = bills.filter(b => statusFilter === 'ALL' ? true : b.status === statusFilter);
 
   return (
     <div className="space-y-6">
@@ -141,7 +144,7 @@ export default function DailyBillsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <p className="text-sm text-gray-500 font-medium">Total Bills</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{bills.length}</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{filteredBills.length}</p>
             </div>
             <div className="bg-indigo-50 p-4 rounded-xl shadow-sm border border-indigo-100">
               <p className="text-sm text-indigo-600 font-medium">Total Bill Amount</p>
@@ -155,6 +158,19 @@ export default function DailyBillsPage() {
               <p className="text-sm text-rose-600 font-medium">Unpaid Bills</p>
               <p className="text-2xl font-bold text-rose-700 mt-1">{unpaidCount}</p>
             </div>
+          </div>
+
+          <div className="flex justify-end">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="PAID">Paid</option>
+              <option value="UNPAID">Unpaid</option>
+              <option value="CREDIT_BILL">Credit Bill</option>
+            </select>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -174,10 +190,10 @@ export default function DailyBillsPage() {
                 <tbody className="divide-y divide-gray-100">
                   {loading ? (
                     <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading...</td></tr>
-                  ) : bills.length === 0 ? (
+                  ) : filteredBills.length === 0 ? (
                     <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">No daily bills found for {formatDate(selectedDate)}</td></tr>
                   ) : (
-                    bills.map(bill => (
+                    filteredBills.map(bill => (
                       <tr key={bill.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 font-medium text-gray-900">{bill.billNumber}</td>
                         <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
@@ -186,6 +202,10 @@ export default function DailyBillsPage() {
                           {bill.status === 'PAID' ? (
                             <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-medium bg-emerald-50 px-2 py-0.5 rounded">
                               <CheckCircle2 className="h-3 w-3" /> PAID
+                            </span>
+                          ) : bill.status === 'CREDIT_BILL' ? (
+                            <span className="inline-flex items-center gap-1 text-indigo-600 text-xs font-medium bg-indigo-50 px-2 py-0.5 rounded">
+                              <Circle className="h-3 w-3" /> CREDIT BILL
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-amber-600 text-xs font-medium bg-amber-50 px-2 py-0.5 rounded">
@@ -223,10 +243,10 @@ export default function DailyBillsPage() {
             <div className="md:hidden divide-y divide-gray-100">
               {loading ? (
                 <div className="p-8 text-center text-gray-500 text-sm">Loading...</div>
-              ) : bills.length === 0 ? (
+              ) : filteredBills.length === 0 ? (
                 <div className="p-8 text-center text-gray-500 text-sm">No daily bills found for {formatDate(selectedDate)}</div>
               ) : (
-                bills.map(bill => (
+                filteredBills.map(bill => (
                   <div key={bill.id} className="p-4 bg-white space-y-3">
                     <div className="flex justify-between items-start">
                       <div>
@@ -240,6 +260,8 @@ export default function DailyBillsPage() {
                       <div className="flex items-center gap-3 text-sm">
                         {bill.status === 'PAID' ? (
                           <span className="text-emerald-600 font-medium">PAID ({bill.paymentMethod})</span>
+                        ) : bill.status === 'CREDIT_BILL' ? (
+                          <span className="text-indigo-600 font-medium">CREDIT BILL</span>
                         ) : (
                           <span className="text-amber-600 font-medium">UNPAID</span>
                         )}

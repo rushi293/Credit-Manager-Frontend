@@ -12,7 +12,7 @@ const dailyBillSchema = z.object({
   customerId: z.string().min(1, 'Please select a customer'),
   billNumber: z.string().min(1, 'Bill number is required'),
   billAmount: z.number().positive('Amount must be greater than zero'),
-  status: z.enum(['PAID', 'UNPAID']),
+  status: z.enum(['PAID', 'UNPAID', 'CREDIT_BILL']),
   paymentMethod: z.string().optional().nullable(),
   billDate: z.string().min(1, 'Bill date is required'),
 }).refine(data => {
@@ -288,6 +288,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
             >
               <option value="UNPAID">UNPAID</option>
               <option value="PAID">PAID</option>
+              <option value="CREDIT_BILL">CREDIT BILL</option>
             </select>
           </div>
 

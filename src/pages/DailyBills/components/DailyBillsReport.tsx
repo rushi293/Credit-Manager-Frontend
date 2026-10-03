@@ -43,7 +43,7 @@ export function DailyBillsReport({ bills, selectedDate }: DailyBillsReportProps)
       b.customer?.name || '-',
       b.billNumber,
       formatCurrency(Number(b.billAmount)),
-      b.status === 'PAID' ? 'Paid' : 'Unpaid',
+      b.status === 'PAID' ? 'Paid' : b.status === 'CREDIT_BILL' ? 'Credit Bill' : 'Unpaid',
       b.status === 'PAID' ? (b.paymentMethod || '-') : '-'
     ]);
 
