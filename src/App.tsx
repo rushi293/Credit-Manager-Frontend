@@ -11,6 +11,7 @@ import BillDetailsPage from '@/pages/Bills/BillDetails';
 import PaymentsPage from '@/pages/Payments';
 import ReportsPage from '@/pages/Reports';
 import SettingsPage from '@/pages/Settings';
+import DailyBillsPage from '@/pages/DailyBills';
 
 import LoginPage from '@/pages/Auth/Login';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -96,6 +97,7 @@ function App() {
                 <Route path="customers/:id"        element={<CustomerDetailsPage />} />
                 <Route path="bills"                element={<BillsPage />} />
                 <Route path="bills/:id"            element={<BillDetailsPage />} />
+                <Route path="daily-bills"          element={<DailyBillsPage />} />
                 <Route path="payments"             element={<PaymentsPage />} />
                 <Route path="reports"              element={<ReportsPage />} />
                 <Route path="settings"             element={<SettingsPage />} />

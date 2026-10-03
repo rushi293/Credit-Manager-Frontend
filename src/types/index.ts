@@ -93,3 +93,21 @@ export interface DashboardData {
   recentBills: CreditBill[];
   recentPayments: Payment[];
 }
+
+export type DailyBillStatus = 'PAID' | 'UNPAID';
+export type DailyPaymentMethod = 'GPay' | 'Cash';
+
+export interface DailyBill {
+  id: string;
+  businessId: string;
+  customerId: string;
+  billNumber: string;
+  billAmount: Decimal;
+  status: DailyBillStatus;
+  paymentMethod: DailyPaymentMethod | null;
+  billDate: string;
+  createdAt: string;
+  updatedAt: string;
+
+  customer?: { name: string };
+}

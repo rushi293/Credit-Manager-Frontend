@@ -31,6 +31,7 @@ const navigation = [
   { name: 'Dashboard', href: '/',         icon: LayoutDashboard },
   { name: 'Customers', href: '/customers', icon: Users },
   { name: 'Bills',     href: '/bills',     icon: Receipt },
+  { name: 'Daily Bills', href: '/daily-bills', icon: Receipt },
   { name: 'Payments',  href: '/payments',  icon: CreditCard },
   { name: 'Reports',   href: '/reports',   icon: BarChart2 },
   { name: 'Settings',  href: '/settings',  icon: Settings },

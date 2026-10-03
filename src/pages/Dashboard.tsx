@@ -263,6 +263,7 @@ export default function Dashboard() {
   useAppEvent(
     [
       'CREDIT_BILL_CREATED', 'CREDIT_BILL_UPDATED', 'CREDIT_BILL_DELETED',
+      'DAILY_BILL_CREATED', 'DAILY_BILL_UPDATED', 'DAILY_BILL_DELETED',
       'PAYMENT_CREATED', 'PAYMENT_DELETED', 'CUSTOMER_UPDATED', 'CUSTOMER_DELETED',
       'METRICS_UPDATED', 'RECONNECTED'
     ],
@@ -808,16 +809,6 @@ export default function Dashboard() {
               Business Metrics for {selectedDate.toISOString().split('T')[0]}
             </h3>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Total Sales</label>
-                <input 
-                  type="number" 
-                  value={editSales} 
-                  onChange={e => setEditSales(e.target.value)} 
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none" 
-                  placeholder="0"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Total Expense</label>
                 <input 
