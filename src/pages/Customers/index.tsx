@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import {  useState, useEffect, useMemo  } from 'react';
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, User, AlertCircle, RefreshCw, ChevronRight } from 'lucide-react';
 
@@ -37,6 +38,13 @@ export default function CustomersPage() {
   useEffect(() => {
     fetchCustomers();
   }, []);
+
+  useAppEvent(
+    ['CUSTOMER_CREATED', 'CUSTOMER_UPDATED', 'CUSTOMER_DELETED', 'CREDIT_BILL_CREATED', 'CREDIT_BILL_DELETED', 'PAYMENT_CREATED', 'PAYMENT_DELETED', 'RECONNECTED'],
+    () => {
+      fetchCustomers();
+    }
+  );
 
   const filteredCustomers = useMemo(() => {
     return customers.filter(c => 

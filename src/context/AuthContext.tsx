@@ -3,7 +3,6 @@ import type { User } from '../services/auth';
 import { authService } from '../services/auth';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AUTH_BYPASS — When VITE_AUTH_BYPASS=true the AuthContext immediately
 // resolves with loading=false and isAuthenticated=true so the app renders
 // without waiting for the backend. Token/user remain null in this mode.
 //
@@ -73,7 +72,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setBusiness(newBusiness);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (e) {
+      console.error(e);
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setToken(null);

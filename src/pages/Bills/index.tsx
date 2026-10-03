@@ -1,5 +1,6 @@
 import { billService } from '@/services/bills';
-import { useState, useEffect, useMemo } from 'react';
+import {  useState, useEffect, useMemo  } from 'react';
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Receipt, AlertCircle, RefreshCw, Filter, ChevronRight } from 'lucide-react';
 
@@ -55,6 +56,13 @@ export default function BillsPage() {
   useEffect(() => {
     fetchBills();
   }, [showArchived, statusFilter]);
+
+  useAppEvent(
+    ['CREDIT_BILL_CREATED', 'CREDIT_BILL_UPDATED', 'CREDIT_BILL_DELETED', 'PAYMENT_CREATED', 'PAYMENT_DELETED', 'CUSTOMER_UPDATED', 'CUSTOMER_DELETED', 'RECONNECTED'],
+    () => {
+      fetchBills();
+    }
+  );
 
   const filteredBills = useMemo(() => {
     return bills.filter(b => {

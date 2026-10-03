@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import {  useState, useEffect, useRef  } from 'react';
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { Download, TrendingUp, Users, FileText, AlertCircle, RefreshCw, ChevronDown } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
@@ -66,6 +67,13 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchReportData();
   }, []);
+
+  useAppEvent(
+    ['METRICS_UPDATED', 'CREDIT_BILL_CREATED', 'CREDIT_BILL_UPDATED', 'CREDIT_BILL_DELETED', 'PAYMENT_CREATED', 'PAYMENT_DELETED', 'CUSTOMER_CREATED', 'CUSTOMER_UPDATED', 'CUSTOMER_DELETED', 'RECONNECTED'],
+    () => {
+      fetchReportData();
+    }
+  );
 
   const exportCustomersToCSV = async () => {
     try {

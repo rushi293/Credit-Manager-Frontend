@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import {  useState, useEffect, useMemo  } from 'react';
+import { useAppEvent } from '@/hooks/useAppEvent';
 import { Plus, Search, CreditCard, AlertCircle, RefreshCw, Filter } from 'lucide-react';
 
 import { paymentService } from '@/services/payments';
@@ -35,6 +36,13 @@ export default function PaymentsPage() {
   useEffect(() => {
     fetchPayments();
   }, []);
+
+  useAppEvent(
+    ['PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'CUSTOMER_UPDATED', 'RECONNECTED'],
+    () => {
+      fetchPayments();
+    }
+  );
 
   const filteredPayments = useMemo(() => {
     return payments.filter(p => {

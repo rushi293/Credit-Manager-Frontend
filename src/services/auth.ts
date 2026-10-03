@@ -28,6 +28,14 @@ export const authService = {
     return response.data.data;
   },
 
+  async logout() {
+    try {
+      await apiClient.post<ApiResponse<any>>("/auth/logout");
+    } catch (e) {
+      console.error('Logout failed:', e);
+    }
+  },
+
   async getMe() {
     const response = await apiClient.get<ApiResponse<{ user: User, business: any }>>("/auth/me");
     return response.data.data;

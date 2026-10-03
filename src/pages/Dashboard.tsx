@@ -263,7 +263,7 @@ export default function Dashboard() {
   useAppEvent(
     [
       'CREDIT_BILL_CREATED', 'CREDIT_BILL_UPDATED', 'CREDIT_BILL_DELETED',
-      'PAYMENT_CREATED', 'PAYMENT_DELETED',
+      'PAYMENT_CREATED', 'PAYMENT_DELETED', 'CUSTOMER_UPDATED', 'CUSTOMER_DELETED',
       'METRICS_UPDATED', 'RECONNECTED'
     ],
     () => {
