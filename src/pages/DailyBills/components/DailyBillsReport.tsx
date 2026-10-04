@@ -1,9 +1,10 @@
-import { formatCurrency, formatDate } from '@/lib/format';
+import { useState } from 'react';
+import { formatDate } from '@/lib/format';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { DailyBill } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 
 interface DailyBillsReportProps {
@@ -14,20 +15,43 @@ interface DailyBillsReportProps {
 export function DailyBillsReport({ bills, selectedDate }: DailyBillsReportProps) {
   const { business } = useAuth();
   const toast = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     if (!bills.length) {
       toast.error('No Daily Bills found for this date.');
       return;
     }
 
-    const doc = new jsPDF();
+    setIsGenerating(true);
+    try {
+      const doc = new jsPDF();
+      
+      try {
+        const fontUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf';
+        const response = await fetch(fontUrl);
+        const buffer = await response.arrayBuffer();
+        
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const base64Font = btoa(binary);
+        
+        doc.addFileToVFS('Roboto-Regular.ttf', base64Font);
+        doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+        doc.setFont('Roboto');
+      } catch (fontErr) {
+        console.warn('Failed to load font for Rupee symbol, falling back to default', fontErr);
+        doc.setFont('helvetica');
+      }
     const pageWidth = doc.internal.pageSize.width;
     const businessName = business?.name || 'DAILY BILL REPORT';
     const reportDate = formatDate(selectedDate).toUpperCase();
     
     // Header
-    doc.setFont('helvetica', 'bold');
     doc.setFontSize(22);
     doc.text(businessName.toUpperCase(), pageWidth / 2, 20, { align: 'center' });
     
@@ -35,14 +59,13 @@ export function DailyBillsReport({ bills, selectedDate }: DailyBillsReportProps)
     doc.text('DAILY BILL REPORT', pageWidth / 2, 30, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
     doc.text(reportDate, pageWidth / 2, 40, { align: 'center' });
 
     // Table Data
     const tableData = bills.map(b => [
       b.customer?.name || '-',
       b.billNumber,
-      formatCurrency(Number(b.billAmount)),
+      Number(b.billAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       b.status === 'PAID' ? 'Paid' : b.status === 'CREDIT_BILL' ? 'Credit Bill' : 'Unpaid',
       b.status === 'PAID' ? (b.paymentMethod || '-') : '-'
     ]);
@@ -52,8 +75,8 @@ export function DailyBillsReport({ bills, selectedDate }: DailyBillsReportProps)
       head: [['Customer Shop', 'Bill No.', 'Amount', 'Status', 'Payment']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [63, 81, 181], textColor: 255, fontStyle: 'bold' },
-      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [63, 81, 181], textColor: 255, fontStyle: 'bold', font: 'Roboto' },
+      styles: { fontSize: 10, cellPadding: 3, font: 'Roboto' },
       columnStyles: {
         0: { cellWidth: 'auto' },
         1: { cellWidth: 30 },
@@ -67,11 +90,17 @@ export function DailyBillsReport({ bills, selectedDate }: DailyBillsReportProps)
     const totalAmount = bills.reduce((sum, b) => sum + Number(b.billAmount), 0);
     const finalY = (doc as any).lastAutoTable.finalY || 50;
 
-    doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text(`Total Bill Amount: ${formatCurrency(totalAmount)}`, 14, finalY + 15);
+    const formattedTotal = totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    doc.text(`Total Bill Amount: ₹ ${formattedTotal}`, 14, finalY + 15);
 
     doc.save(`daily-bills-${selectedDate}.pdf`);
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -101,10 +130,20 @@ export function DailyBillsReport({ bills, selectedDate }: DailyBillsReportProps)
             <div>
               <button
                 onClick={generatePDF}
-                className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-sm font-medium transition-colors shadow-sm"
+                disabled={isGenerating}
+                className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
               >
-                <Download className="mr-2 h-5 w-5" />
-                Download PDF
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-5 w-5" />
+                    Download PDF
+                  </>
+                )}
               </button>
             </div>
           </div>
