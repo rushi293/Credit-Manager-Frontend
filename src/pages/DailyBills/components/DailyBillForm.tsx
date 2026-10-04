@@ -61,7 +61,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
     defaultValues: {
       customerId: '',
       billNumber: '',
-      billAmount: undefined,
+      billAmount: '' as any,
       status: 'UNPAID',
       paymentMethod: '',
       billDate: defaultDate || new Date().toISOString().slice(0, 10),
@@ -77,7 +77,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
       if (initialData) {
         setValue('customerId', initialData.customerId || '');
         setValue('billNumber', initialData.billNumber || '');
-        setValue('billAmount', Number(initialData.billAmount) || undefined as any);
+        setValue('billAmount', Number(initialData.billAmount) || ('' as any));
         setValue('status', initialData.status || 'UNPAID');
         setValue('paymentMethod', initialData.paymentMethod || '');
         setValue('billDate', initialData.billDate ? new Date(initialData.billDate).toISOString().slice(0, 10) : (defaultDate || new Date().toISOString().slice(0, 10)));
@@ -85,7 +85,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
         reset({
           customerId: '',
           billNumber: '',
-          billAmount: undefined,
+          billAmount: '' as any,
           status: 'UNPAID',
           paymentMethod: '',
           billDate: defaultDate || new Date().toISOString().slice(0, 10),
