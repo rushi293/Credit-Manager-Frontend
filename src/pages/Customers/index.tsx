@@ -76,8 +76,8 @@ export default function CustomersPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Toolbar */}
-        <div className="p-4 border-b border-gray-100 bg-white">
-          <div className="relative max-w-md">
+        <div className="p-4 border-b border-gray-100 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input 
               type="text"
@@ -86,6 +86,9 @@ export default function CustomersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+          </div>
+          <div className="text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 whitespace-nowrap shadow-sm">
+            Total Customers: <span className="font-bold text-gray-900">{customers.length}</span>
           </div>
         </div>
         
