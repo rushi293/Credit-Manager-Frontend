@@ -46,6 +46,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
   // Custom searchable dropdown state
   const [search, setSearch] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -197,9 +198,33 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
                 onChange={(e) => {
                   setSearch(e.target.value);
                   setIsDropdownOpen(true);
+                  setSelectedIndex(0); // Reset selection
                   if (watchCustomerId) setValue('customerId', ''); // clear selection if they type
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
+                onKeyDown={(e) => {
+                  if (!isDropdownOpen) {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') setIsDropdownOpen(true);
+                    return;
+                  }
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSelectedIndex(prev => (prev < filteredCustomers.length - 1 ? prev + 1 : prev));
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
+                  } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (filteredCustomers[selectedIndex]) {
+                      const selectedC = filteredCustomers[selectedIndex];
+                      setValue('customerId', selectedC.id, { shouldValidate: true });
+                      setSearch(selectedC.name);
+                      setIsDropdownOpen(false);
+                    }
+                  } else if (e.key === 'Escape') {
+                    setIsDropdownOpen(false);
+                  }
+                }}
                 className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors sm:text-sm"
               />
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -209,10 +234,13 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
                   {loadingCustomers ? (
                     <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
                   ) : filteredCustomers.length > 0 ? (
-                    filteredCustomers.map(c => (
+                    filteredCustomers.map((c, idx) => (
                       <div
                         key={c.id}
-                        className="px-4 py-2 text-sm cursor-pointer hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+                        onMouseEnter={() => setSelectedIndex(idx)}
+                        className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
+                          selectedIndex === idx ? 'bg-indigo-100 text-indigo-900' : 'hover:bg-indigo-50 hover:text-indigo-700'
+                        }`}
                         onClick={() => {
                           setValue('customerId', c.id, { shouldValidate: true });
                           setSearch(c.name);
