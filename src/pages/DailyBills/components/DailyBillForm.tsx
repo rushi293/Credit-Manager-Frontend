@@ -115,6 +115,15 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isDropdownOpen && selectedIndex >= 0) {
+      const el = document.getElementById(`customer-option-${selectedIndex}`);
+      if (el) {
+        el.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [selectedIndex, isDropdownOpen]);
+
   const loadCustomers = async () => {
     setLoadingCustomers(true);
     try {
@@ -237,6 +246,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
                     filteredCustomers.map((c, idx) => (
                       <div
                         key={c.id}
+                        id={`customer-option-${idx}`}
                         onMouseEnter={() => setSelectedIndex(idx)}
                         className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
                           selectedIndex === idx ? 'bg-indigo-100 text-indigo-900' : 'hover:bg-indigo-50 hover:text-indigo-700'
