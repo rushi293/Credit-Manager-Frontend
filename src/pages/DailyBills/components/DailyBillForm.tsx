@@ -117,9 +117,20 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
 
   useEffect(() => {
     if (isDropdownOpen && selectedIndex >= 0) {
+      const container = document.getElementById('customer-dropdown-container');
       const el = document.getElementById(`customer-option-${selectedIndex}`);
-      if (el) {
-        el.scrollIntoView({ block: 'nearest' });
+      
+      if (container && el) {
+        const containerTop = container.scrollTop;
+        const containerBottom = containerTop + container.clientHeight;
+        const elTop = el.offsetTop;
+        const elBottom = elTop + el.offsetHeight;
+
+        if (elBottom > containerBottom) {
+          container.scrollTop = elBottom - container.clientHeight;
+        } else if (elTop < containerTop) {
+          container.scrollTop = elTop;
+        }
       }
     }
   }, [selectedIndex, isDropdownOpen]);
@@ -239,7 +250,7 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               
               {isDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+                <div id="customer-dropdown-container" className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
                   {loadingCustomers ? (
                     <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
                   ) : filteredCustomers.length > 0 ? (
