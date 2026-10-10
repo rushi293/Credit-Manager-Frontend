@@ -1,19 +1,20 @@
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ToastProvider } from '@/components/ui/toast';
 import { ThemeProvider } from '@/context/ThemeContext';
-import Dashboard from '@/pages/Dashboard';
 
-import CustomersPage from '@/pages/Customers';
-import CustomerDetailsPage from '@/pages/Customers/CustomerDetails';
-import BillsPage from '@/pages/Bills';
-import BillDetailsPage from '@/pages/Bills/BillDetails';
-import PaymentsPage from '@/pages/Payments';
-import ReportsPage from '@/pages/Reports';
-import SettingsPage from '@/pages/Settings';
-import DailyBillsPage from '@/pages/DailyBills';
+const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
+const CustomersPage = React.lazy(() => import('@/pages/Customers'));
+const CustomerDetailsPage = React.lazy(() => import('@/pages/Customers/CustomerDetails'));
+const BillsPage = React.lazy(() => import('@/pages/Bills'));
+const BillDetailsPage = React.lazy(() => import('@/pages/Bills/BillDetails'));
+const PaymentsPage = React.lazy(() => import('@/pages/Payments'));
+const ReportsPage = React.lazy(() => import('@/pages/Reports'));
+const SettingsPage = React.lazy(() => import('@/pages/Settings'));
+const DailyBillsPage = React.lazy(() => import('@/pages/DailyBills'));
 
-import LoginPage from '@/pages/Auth/Login';
+const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { OfflineDetector } from '@/components/pwa/OfflineDetector';
 import { SSEProvider } from '@/components/SSEProvider';
@@ -69,6 +70,16 @@ function AuthRoute({ element }: { element: React.ReactElement }) {
   return element;
 }
 
+function PageFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
     <ThemeProvider>
@@ -77,35 +88,37 @@ function App() {
           
           <OfflineDetector />
           <BrowserRouter>
-            <Routes>
-              
-              <Route path="/login"    element={<AuthRoute element={<LoginPage />} />} />
+            <Suspense fallback={<PageFallback />}>
+              <Routes>
+                
+                <Route path="/login"    element={<AuthRoute element={<LoginPage />} />} />
 
-              {/* Main application shell */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <SSEProvider>
-                      <AppLayout />
-                    </SSEProvider>
-                  </ProtectedRoute>
-                }
-              >
-                <Route index                       element={<Dashboard />} />
-                <Route path="customers"            element={<CustomersPage />} />
-                <Route path="customers/:id"        element={<CustomerDetailsPage />} />
-                <Route path="bills"                element={<BillsPage />} />
-                <Route path="bills/:id"            element={<BillDetailsPage />} />
-                <Route path="daily-bills"          element={<DailyBillsPage />} />
-                <Route path="payments"             element={<PaymentsPage />} />
-                <Route path="reports"              element={<ReportsPage />} />
-                <Route path="settings"             element={<SettingsPage />} />
-              </Route>
+                {/* Main application shell */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <SSEProvider>
+                        <AppLayout />
+                      </SSEProvider>
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index                       element={<Dashboard />} />
+                  <Route path="customers"            element={<CustomersPage />} />
+                  <Route path="customers/:id"        element={<CustomerDetailsPage />} />
+                  <Route path="bills"                element={<BillsPage />} />
+                  <Route path="bills/:id"            element={<BillDetailsPage />} />
+                  <Route path="daily-bills"          element={<DailyBillsPage />} />
+                  <Route path="payments"             element={<PaymentsPage />} />
+                  <Route path="reports"              element={<ReportsPage />} />
+                  <Route path="settings"             element={<SettingsPage />} />
+                </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </ToastProvider>
       </AuthProvider>

@@ -17,8 +17,6 @@ export function SSEProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    let retryTimeout: NodeJS.Timeout;
-    
     const connect = () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
@@ -43,20 +41,15 @@ export function SSEProvider({ children }: { children: React.ReactNode }) {
       };
 
       es.onerror = (error) => {
-        console.error('SSE connection error, attempting to reconnect...', error);
-        es.close();
-        
-        // Reconnect after 3 seconds
-        retryTimeout = setTimeout(() => {
-          connect();
-        }, 3000);
+        console.error('SSE connection error...', error);
+        // Do NOT manually close or reconnect. The browser automatically reconnects EventSource.
+        // If it's a fatal error, we could handle it, but standard network drops will auto-reconnect.
       };
     };
 
     connect();
 
     return () => {
-      clearTimeout(retryTimeout);
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
         eventSourceRef.current = null;
