@@ -16,7 +16,7 @@ import { DailyPaidBills } from './components/DailyPaidBills';
 import { DailyBillsReport } from './components/DailyBillsReport';
 import { DailyCreditBills } from './components/DailyCreditBills';
 import { DailyUnpaidBills } from './components/DailyUnpaidBills';
-import { PaymentManagementPopover } from './components/PaymentManagementPopover';
+import { UnifiedPaymentSelector } from './components/UnifiedPaymentSelector';
 
 export default function DailyBillsPage() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
@@ -233,7 +233,7 @@ export default function DailyBillsPage() {
                         <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
                         <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(Number(bill.billAmount))}</td>
                         <td className="px-6 py-4 text-center">
-                          <PaymentManagementPopover bill={bill} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
+                          <UnifiedPaymentSelector bill={bill} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -279,7 +279,7 @@ export default function DailyBillsPage() {
                     
                     <div className="flex items-center justify-between pt-2">
                       <div className="flex items-center gap-3 text-sm">
-                          <PaymentManagementPopover bill={bill} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
+                          <UnifiedPaymentSelector bill={bill} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
                         </div>
                         <div className="flex items-center gap-1">
                         <button
@@ -350,6 +350,7 @@ export default function DailyBillsPage() {
     </div>
   );
 }
+
 
 
 

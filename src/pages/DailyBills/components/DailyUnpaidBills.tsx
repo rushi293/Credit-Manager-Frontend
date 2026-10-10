@@ -1,4 +1,4 @@
-﻿import { PaymentManagementPopover } from './PaymentManagementPopover';
+﻿import { UnifiedPaymentSelector } from './UnifiedPaymentSelector';
 
 import { useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
@@ -50,7 +50,7 @@ export function DailyUnpaidBills({ bills, onSuccess }: DailyUnpaidBillsProps) {
                     <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
                     <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(Number(bill.billAmount))}</td>
                     <td className="px-6 py-4 text-center">
-                      <PaymentManagementPopover bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
+                      <UnifiedPaymentSelector bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
                     </td>
                   </tr>
                 ))
@@ -68,6 +68,7 @@ export function DailyUnpaidBills({ bills, onSuccess }: DailyUnpaidBillsProps) {
     </div>
   );
 }
+
 
 
 
