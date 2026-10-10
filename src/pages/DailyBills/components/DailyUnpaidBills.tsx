@@ -1,15 +1,16 @@
-import { InlinePaymentMethodSelector } from './InlinePaymentMethodSelector';
+﻿import { PaymentManagementPopover } from './PaymentManagementPopover';
 
 import { useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
 import type { DailyBill } from '@/types';
-import { Circle } from 'lucide-react';
+
 
 interface DailyUnpaidBillsProps {
   bills: DailyBill[];
+  onSuccess?: () => void;
 }
 
-export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
+export function DailyUnpaidBills({ bills, onSuccess }: DailyUnpaidBillsProps) {
   const unpaidBills = useMemo(() => bills.filter(b => b.status === 'UNPAID'), [bills]);
   const totalAmount = unpaidBills.reduce((sum, b) => sum + Number(b.billAmount), 0);
 
@@ -38,8 +39,7 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
                 <th className="px-6 py-3 font-medium">Bill No.</th>
                 <th className="px-6 py-3 font-medium">Customer Shop</th>
                 <th className="px-6 py-3 font-medium text-right">Amount</th>
-                <th className="px-6 py-3 font-medium text-center">Status</th>
-                <th className="px-6 py-3 font-medium text-center">Method</th>
+                <th className="px-6 py-3 font-medium text-center">Payment</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -50,12 +50,7 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
                     <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
                     <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(Number(bill.billAmount))}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-flex items-center gap-1 text-amber-600 text-xs font-medium bg-amber-50 px-2 py-0.5 rounded">
-                        <Circle className="h-3 w-3" /> UNPAID
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <InlinePaymentMethodSelector bill={bill} onUpdate={() => window.location.reload()} />
+                      <PaymentManagementPopover bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
                     </td>
                   </tr>
                 ))
@@ -73,5 +68,8 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
     </div>
   );
 }
+
+
+
 
 

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAppEvent } from '@/hooks/useAppEvent';
 import { 
   Plus, Calendar as CalendarIcon, Upload,
-  Edit2, Trash2, CheckCircle2, Circle
+  Edit2, Trash2, 
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ import { DailyPaidBills } from './components/DailyPaidBills';
 import { DailyBillsReport } from './components/DailyBillsReport';
 import { DailyCreditBills } from './components/DailyCreditBills';
 import { DailyUnpaidBills } from './components/DailyUnpaidBills';
-import { InlinePaymentMethodSelector } from './components/InlinePaymentMethodSelector';
+import { PaymentManagementPopover } from './components/PaymentManagementPopover';
 
 export default function DailyBillsPage() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
@@ -217,8 +217,7 @@ export default function DailyBillsPage() {
                     <th className="px-6 py-3 font-medium">Bill No.</th>
                     <th className="px-6 py-3 font-medium">Customer Shop</th>
                     <th className="px-6 py-3 font-medium text-right">Amount</th>
-                    <th className="px-6 py-3 font-medium text-center">Status</th>
-                    <th className="px-6 py-3 font-medium text-center">Method</th>
+                    <th className="px-6 py-3 font-medium text-center">Payment</th>
                     <th className="px-6 py-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
@@ -234,22 +233,7 @@ export default function DailyBillsPage() {
                         <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
                         <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(Number(bill.billAmount))}</td>
                         <td className="px-6 py-4 text-center">
-                          {bill.status === 'PAID' ? (
-                            <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-medium bg-emerald-50 px-2 py-0.5 rounded">
-                              <CheckCircle2 className="h-3 w-3" /> PAID
-                            </span>
-                          ) : bill.status === 'CREDIT_BILL' ? (
-                            <span className="inline-flex items-center gap-1 text-indigo-600 text-xs font-medium bg-indigo-50 px-2 py-0.5 rounded">
-                              <Circle className="h-3 w-3" /> CREDIT BILL
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-amber-600 text-xs font-medium bg-amber-50 px-2 py-0.5 rounded">
-                              <Circle className="h-3 w-3" /> UNPAID
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-center text-gray-600">
-                          <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} />
+                          <PaymentManagementPopover bill={bill} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -295,15 +279,9 @@ export default function DailyBillsPage() {
                     
                     <div className="flex items-center justify-between pt-2">
                       <div className="flex items-center gap-3 text-sm">
-                        {bill.status === 'PAID' ? (
-                          <span className="text-emerald-600 font-medium flex items-center gap-2">PAID <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} /></span>
-                        ) : bill.status === 'CREDIT_BILL' ? (
-                          <span className="text-indigo-600 font-medium flex items-center gap-2">CREDIT BILL <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} /></span>
-                        ) : (
-                          <span className="text-amber-600 font-medium flex items-center gap-2">UNPAID <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} /></span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
+                          <PaymentManagementPopover bill={bill} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
+                        </div>
+                        <div className="flex items-center gap-1">
                         <button
                           onClick={() => { setEditingBill(bill); setIsFormOpen(true); }}
                           className="p-2 text-indigo-600 bg-indigo-50 rounded-lg"
@@ -335,7 +313,7 @@ export default function DailyBillsPage() {
       )}
 
       {activeTab === 'UNPAID' && (
-        <DailyUnpaidBills bills={bills} />
+        <DailyUnpaidBills bills={bills} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
       )}
 
       {activeTab === 'REPORT' && (
@@ -347,7 +325,7 @@ export default function DailyBillsPage() {
         onOpenChange={setIsFormOpen}
         initialData={editingBill}
         defaultDate={selectedDate}
-        onSuccess={() => {}}
+        onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }}
       />
 
       <ConfirmDialog
@@ -372,5 +350,11 @@ export default function DailyBillsPage() {
     </div>
   );
 }
+
+
+
+
+
+
 
 
