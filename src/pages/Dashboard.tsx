@@ -179,8 +179,8 @@ export default function Dashboard() {
 
       // Run both fetches in parallel instead of sequentially
       const [data, monthlyData] = await Promise.all([
-        metricsService.getMetrics(startDate.toISOString(), d.toISOString()),
-        metricsService.getMetrics(sixMonthsAgo.toISOString(), d.toISOString()),
+        metricsService.getMetrics(startDate.toISOString().split('T')[0], d.toISOString().split('T')[0]),
+        metricsService.getMetrics(sixMonthsAgo.toISOString().split('T')[0], d.toISOString().split('T')[0]),
       ]);
 
       // Fill missing days with empty values for the chart
