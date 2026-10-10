@@ -122,7 +122,21 @@ export default function Dashboard() {
   const [metricsLoading, setMetricsLoading] = useState(true);
   const [dailyMetrics, setDailyMetrics] = useState<any[]>([]);
   const [monthlyMetrics, setMonthlyMetrics] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    try {
+      const saved = sessionStorage.getItem('dashboardSelectedDate');
+      if (saved) {
+        const parsed = new Date(saved);
+        if (!isNaN(parsed.getTime())) return parsed;
+      }
+    } catch {}
+    return new Date();
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('dashboardSelectedDate', selectedDate.toISOString());
+  }, [selectedDate]);
   
   // Edit modal state
   const [isEditingMetrics, setIsEditingMetrics] = useState(false);
