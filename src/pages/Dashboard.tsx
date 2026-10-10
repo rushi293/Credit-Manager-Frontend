@@ -178,10 +178,8 @@ export default function Dashboard() {
       sixMonthsAgo.setDate(1); // Start of that month
 
       // Run both fetches in parallel instead of sequentially
-      const [data, monthlyData] = await Promise.all([
-        metricsService.getMetrics(startDate.toISOString().split('T')[0], d.toISOString().split('T')[0]),
-        metricsService.getMetrics(sixMonthsAgo.toISOString().split('T')[0], d.toISOString().split('T')[0]),
-      ]);
+      const monthlyData = await metricsService.getMetrics(sixMonthsAgo.toISOString().split('T')[0], d.toISOString().split('T')[0]);
+      const data = monthlyData;
 
       // Fill missing days with empty values for the chart
       const chart = [];
@@ -264,11 +262,11 @@ export default function Dashboard() {
   };
 
   useEffect(() => { 
-    fetchDashboardData(); 
-  }, [selectedDate]);
-
-  useEffect(() => {
-    fetchMetrics();
+    const load = async () => {
+      await fetchDashboardData();
+      await fetchMetrics();
+    };
+    load();
   }, [selectedDate]);
 
   useAppEvent(
@@ -278,9 +276,9 @@ export default function Dashboard() {
       'PAYMENT_CREATED', 'PAYMENT_DELETED', 'CUSTOMER_UPDATED', 'CUSTOMER_DELETED',
       'METRICS_UPDATED', 'RECONNECTED'
     ],
-    () => {
-      fetchDashboardData();
-      fetchMetrics();
+    async () => {
+      await fetchDashboardData();
+      await fetchMetrics();
     }
   );
 
@@ -978,3 +976,4 @@ function DashboardSkeleton() {
     </div>
   );
 }
+
