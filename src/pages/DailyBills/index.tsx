@@ -87,26 +87,28 @@ export default function DailyBillsPage() {
           <p className="text-sm text-gray-500 mt-1">Manage daily sales bills separately from credit accounts.</p>
         </div>
         
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-auto">
-            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input 
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-auto min-w-[140px]">
+              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input 
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <button 
+              onClick={() => setIsPdfImportOpen(true)}
+              className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </button>
           </div>
           <button 
-            onClick={() => setIsPdfImportOpen(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            Import PDF
-          </button>
-          <button 
             onClick={() => { setEditingBill(undefined); setIsFormOpen(true); }}
-            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Daily Bill
