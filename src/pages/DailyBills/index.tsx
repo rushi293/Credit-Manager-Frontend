@@ -16,6 +16,7 @@ import { DailyPaidBills } from './components/DailyPaidBills';
 import { DailyBillsReport } from './components/DailyBillsReport';
 import { DailyCreditBills } from './components/DailyCreditBills';
 import { DailyUnpaidBills } from './components/DailyUnpaidBills';
+import { InlinePaymentMethodSelector } from './components/InlinePaymentMethodSelector';
 
 export default function DailyBillsPage() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
@@ -247,7 +248,9 @@ export default function DailyBillsPage() {
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-center text-gray-600">{bill.paymentMethod || '-'}</td>
+                        <td className="px-6 py-4 text-center text-gray-600">
+                          <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} />
+                        </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
@@ -293,11 +296,11 @@ export default function DailyBillsPage() {
                     <div className="flex items-center justify-between pt-2">
                       <div className="flex items-center gap-3 text-sm">
                         {bill.status === 'PAID' ? (
-                          <span className="text-emerald-600 font-medium">PAID ({bill.paymentMethod})</span>
+                          <span className="text-emerald-600 font-medium flex items-center gap-2">PAID <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} /></span>
                         ) : bill.status === 'CREDIT_BILL' ? (
-                          <span className="text-indigo-600 font-medium">CREDIT BILL</span>
+                          <span className="text-indigo-600 font-medium flex items-center gap-2">CREDIT BILL <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} /></span>
                         ) : (
-                          <span className="text-amber-600 font-medium">UNPAID</span>
+                          <span className="text-amber-600 font-medium flex items-center gap-2">UNPAID <InlinePaymentMethodSelector bill={bill} onUpdate={(id, method) => setBills(bills.map(b => b.id === id ? { ...b, paymentMethod: method as any } : b))} /></span>
                         )}
                       </div>
                       <div className="flex items-center gap-1">
@@ -369,3 +372,5 @@ export default function DailyBillsPage() {
     </div>
   );
 }
+
+

@@ -1,3 +1,5 @@
+import { InlinePaymentMethodSelector } from './InlinePaymentMethodSelector';
+import { dailyBillService } from '@/services/dailyBills';
 import { useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
 import type { DailyBill } from '@/types';
@@ -37,6 +39,7 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
                 <th className="px-6 py-3 font-medium">Customer Shop</th>
                 <th className="px-6 py-3 font-medium text-right">Amount</th>
                 <th className="px-6 py-3 font-medium text-center">Status</th>
+                <th className="px-6 py-3 font-medium text-center">Method</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -51,11 +54,14 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
                         <Circle className="h-3 w-3" /> UNPAID
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      <InlinePaymentMethodSelector bill={bill} onUpdate={() => window.location.reload()} />
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                     No unpaid bills found for this selection.
                   </td>
                 </tr>
@@ -67,3 +73,4 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
     </div>
   );
 }
+
