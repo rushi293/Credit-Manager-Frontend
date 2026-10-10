@@ -27,7 +27,6 @@ export function InlinePaymentMethodSelector({ bill, onUpdate }: InlinePaymentMet
     } catch (err: any) {
       console.error(err);
       toast.error('Failed to update payment method.');
-      // It will revert visually because we don't update local state unless successful
     } finally {
       setIsUpdating(false);
     }
@@ -39,15 +38,13 @@ export function InlinePaymentMethodSelector({ bill, onUpdate }: InlinePaymentMet
         value={bill.paymentMethod || ''}
         onChange={handleChange}
         disabled={isUpdating}
-        className="text-sm bg-white border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 transition-colors"
+        className="w-28 text-sm bg-white border border-gray-300 text-gray-900 font-medium rounded-lg shadow-sm py-1.5 px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 transition-all cursor-pointer hover:bg-gray-50"
       >
-        <option value="">-</option>
-        <option value="Cash">Cash</option>
-        <option value="GPay">GPay</option>
+        <option value="">None</option>
+        <option value="Cash">Cash ??</option>
+        <option value="GPay">GPay ??</option>
       </select>
-      {isUpdating && <Loader2 className="h-3 w-3 animate-spin text-indigo-500" />}
+      {isUpdating && <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />}
     </div>
   );
 }
-
-

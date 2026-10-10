@@ -105,3 +105,5 @@ export function DailyPaidBills({ bills }: DailyPaidBillsProps) {
     </div>
   );
 }
+
+
