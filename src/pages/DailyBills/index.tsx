@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppEvent } from '@/hooks/useAppEvent';
 import { 
-  Plus, Calendar as CalendarIcon, 
+  Plus, Calendar as CalendarIcon, Upload,
   Edit2, Trash2, CheckCircle2, Circle
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/format';
@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { dailyBillService } from '@/services/dailyBills';
 import type { DailyBill } from '@/types';
 import { DailyBillForm } from './components/DailyBillForm';
+import { PdfImportModal } from './components/PdfImportModal';
 import { DailyPaidBills } from './components/DailyPaidBills';
 import { DailyBillsReport } from './components/DailyBillsReport';
 import { DailyCreditBills } from './components/DailyCreditBills';
@@ -25,6 +26,7 @@ export default function DailyBillsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
   const [editingBill, setEditingBill] = useState<DailyBill | undefined>();
   
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -94,6 +96,13 @@ export default function DailyBillsPage() {
               className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
+          <button 
+            onClick={() => setIsPdfImportOpen(true)}
+            className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Import PDF
+          </button>
           <button 
             onClick={() => { setEditingBill(undefined); setIsFormOpen(true); }}
             className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
@@ -347,6 +356,15 @@ export default function DailyBillsPage() {
         cancelLabel="Cancel"
         onConfirm={handleDelete}
         danger={true}
+      />
+
+      <PdfImportModal
+        isOpen={isPdfImportOpen}
+        onClose={() => setIsPdfImportOpen(false)}
+        onSuccess={() => {
+          setIsPdfImportOpen(false);
+          fetchBills(); // Refetch bills for selected date
+        }}
       />
     </div>
   );

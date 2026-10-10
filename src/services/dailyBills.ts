@@ -26,6 +26,18 @@ export const dailyBillService = {
     return data;
   },
 
+    async parsePdf(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post<ApiResponse<any[]>>('/daily-bills/parse-pdf', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data.data || [];
+  },
+  async importBills(bills: any[]) {
+    const response = await apiClient.post<ApiResponse<any[]>>('/daily-bills/import', { bills });
+    return response.data;
+  },
   clearCache() {
     cache.clear();
   },
@@ -45,4 +57,5 @@ export const dailyBillService = {
     return response.data;
   }
 };
+
 
