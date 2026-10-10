@@ -172,24 +172,28 @@ export default function Dashboard() {
       startDate.setDate(startDate.getDate() - 6);
       
       
-      const data = await metricsService.getMetrics(startDate.toISOString(), d.toISOString());
-      
+      // Calculate last 6 months range
+      const sixMonthsAgo = new Date(d);
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+      sixMonthsAgo.setDate(1); // Start of that month
+
+      // Run both fetches in parallel instead of sequentially
+      const [data, monthlyData] = await Promise.all([
+        metricsService.getMetrics(startDate.toISOString(), d.toISOString()),
+        metricsService.getMetrics(sixMonthsAgo.toISOString(), d.toISOString()),
+      ]);
+
       // Fill missing days with empty values for the chart
       const chart = [];
       let todayMetric = null;
-      
+
       for (let i = 6; i >= 0; i--) {
         const iterDate = new Date(d);
         iterDate.setDate(iterDate.getDate() - i);
         const dateStr = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(iterDate);
         const iterIso = iterDate.toISOString().split('T')[0];
-        
         const existing = data.find((m: any) => m.date.startsWith(iterIso));
-        
-        if (i === 0) {
-          todayMetric = existing;
-        }
-        
+        if (i === 0) todayMetric = existing;
         chart.push({
           date: dateStr,
           totalSales: existing ? Number(existing.totalSales) : 0,
@@ -197,14 +201,7 @@ export default function Dashboard() {
           expense: existing ? Number(existing.totalExpense) : 0,
         });
       }
-      
-      // Calculate last 6 months
-      const sixMonthsAgo = new Date(d);
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
-      sixMonthsAgo.setDate(1); // Start of that month
-      
-      const monthlyData = await metricsService.getMetrics(sixMonthsAgo.toISOString(), d.toISOString());
-      
+
       const monthlyMap = new Map();
       
       for (let i = 5; i >= 0; i--) {
@@ -290,7 +287,9 @@ export default function Dashboard() {
   const todayData = dailyMetrics.length > 0 ? dailyMetrics[dailyMetrics.length - 1] : null;
   const hasTodayData = todayData && (todayData.totalSales > 0 || todayData.expense > 0 || todayData.iphoneSales > 0);
 
-  if (loading || metricsLoading) return <DashboardSkeleton />;
+  // Only block on the primary dashboard data (metrics summary cards + recent bills).
+  // The charts load separately — they have their own metricsLoading state displayed inline.
+  if (loading) return <DashboardSkeleton />;
   if (!data)   return null;
 
   const { metrics, recentBills, recentPayments } = data;
@@ -435,8 +434,11 @@ export default function Dashboard() {
           <div className="flex items-center gap-3 mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Last 7 Days — Sales Overview</h3>
           </div>
-          <div className="h-[320px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[320px] w-full flex items-center justify-center">
+            {metricsLoading ? (
+              <div className="text-gray-400 text-sm">Loading charts...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
               <LineChart data={dailyMetrics} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis 
@@ -482,6 +484,7 @@ export default function Dashboard() {
                 />
               </LineChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
       </section>
@@ -494,7 +497,10 @@ export default function Dashboard() {
           <div className="flex items-center gap-3 mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Monthly Sales Overview</h3>
           </div>
-          <div className="h-[320px] w-full">
+          <div className="h-[320px] w-full flex items-center justify-center">
+            {metricsLoading ? (
+              <div className="text-gray-400 text-sm">Loading charts...</div>
+            ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyMetrics} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -537,6 +543,7 @@ export default function Dashboard() {
                 />
               </BarChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
       </section>

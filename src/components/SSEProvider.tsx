@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export function SSEProvider({ children }: { children: React.ReactNode }) {
   const { token, isAuthenticated } = useAuth();
   const eventSourceRef = useRef<EventSource | null>(null);
+  const hasConnectedRef = useRef(false);
 
   useEffect(() => {
     if (!isAuthenticated || !token) {
@@ -32,7 +33,10 @@ export function SSEProvider({ children }: { children: React.ReactNode }) {
           if (data.type) {
             appEventBus.emit(data.type, data);
             if (data.type === 'CONNECTED') {
-              appEventBus.emit('RECONNECTED', data);
+              if (hasConnectedRef.current) {
+                appEventBus.emit('RECONNECTED', data);
+              }
+              hasConnectedRef.current = true;
             }
           }
         } catch (e) {
