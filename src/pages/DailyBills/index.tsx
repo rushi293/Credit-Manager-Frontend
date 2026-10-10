@@ -119,51 +119,51 @@ export default function DailyBillsPage() {
           <button
             onClick={() => setActiveTab('ALL')}
             className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors",
+              "px-3 py-2 text-[13px] sm:text-sm sm:px-4 font-medium border-b-2 whitespace-nowrap transition-colors",
               activeTab === 'ALL'
                 ? "border-indigo-600 text-indigo-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            All Daily Bills
+            All
           </button>
           <button
             onClick={() => setActiveTab('PAID')}
             className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors",
+              "px-3 py-2 text-[13px] sm:text-sm sm:px-4 font-medium border-b-2 whitespace-nowrap transition-colors",
               activeTab === 'PAID'
                 ? "border-indigo-600 text-indigo-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            Daily Paid Bills
+            Paid
           </button>
           <button
             onClick={() => setActiveTab('CREDIT_BILL')}
             className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors",
+              "px-3 py-2 text-[13px] sm:text-sm sm:px-4 font-medium border-b-2 whitespace-nowrap transition-colors",
               activeTab === 'CREDIT_BILL'
                 ? "border-indigo-600 text-indigo-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            Daily Credit Bills
+            Credit
           </button>
           <button
             onClick={() => setActiveTab('UNPAID')}
             className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors",
+              "px-3 py-2 text-[13px] sm:text-sm sm:px-4 font-medium border-b-2 whitespace-nowrap transition-colors",
               activeTab === 'UNPAID'
                 ? "border-indigo-600 text-indigo-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             )}
           >
-            Daily Unpaid Bills
+            Unpaid
           </button>
           <button
             onClick={() => setActiveTab('REPORT')}
             className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors",
+              "px-3 py-2 text-[13px] sm:text-sm sm:px-4 font-medium border-b-2 whitespace-nowrap transition-colors",
               activeTab === 'REPORT'
                 ? "border-indigo-600 text-indigo-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -350,6 +350,8 @@ export default function DailyBillsPage() {
     </div>
   );
 }
+
+
 
 
 

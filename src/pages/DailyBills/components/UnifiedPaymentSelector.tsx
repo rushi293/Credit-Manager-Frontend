@@ -53,19 +53,19 @@ export function UnifiedPaymentSelector({ bill, onSuccess }: UnifiedPaymentSelect
   };
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-1">
       <select
         value={currentValue}
         onChange={handleChange}
         disabled={isUpdating}
-        className={`w-36 text-xs font-semibold rounded-lg shadow-sm py-1.5 px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 transition-all cursor-pointer border ${getSelectStyle()}`}
+        className={`w-[100px] text-[11px] leading-tight font-semibold rounded-md shadow-sm py-1 px-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 transition-all cursor-pointer border ${getSelectStyle()}`}
       >
-        <option value="UNPAID">⭕ UNPAID</option>
-        <option value="PAID_Cash">💵 PAID - Cash</option>
-        <option value="PAID_GPay">📱 PAID - GPay</option>
-        <option value="CREDIT_BILL">💳 CREDIT BILL</option>
+        <option value="UNPAID">UNPAID</option>
+        <option value="PAID_Cash">PAID - Cash</option>
+        <option value="PAID_GPay">PAID - GPay</option>
+        <option value="CREDIT_BILL">CREDIT BILL</option>
       </select>
-      {isUpdating && <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />}
+      {isUpdating && <Loader2 className="h-3 w-3 animate-spin text-indigo-600 shrink-0" />}
     </div>
   );
 }
