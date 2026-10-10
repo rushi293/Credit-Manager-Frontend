@@ -36,12 +36,13 @@ export const dailyBillService = {
   },
 
   async updateDailyBill(id: string, data: Partial<DailyBill>) {
-    const response = await apiClient.put<ApiResponse<DailyBill>>(\/daily-bills/\\, data);
+    const response = await apiClient.put<ApiResponse<DailyBill>>(`/daily-bills/${id}`, data);
     return response.data;
   },
 
   async deleteDailyBill(id: string) {
-    const response = await apiClient.delete<ApiResponse<any>>(\/daily-bills/\\);
+    const response = await apiClient.delete<ApiResponse<any>>(`/daily-bills/${id}`);
     return response.data;
   }
 };
+
