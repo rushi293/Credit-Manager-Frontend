@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { Upload, X, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { dailyBillService } from '@/services/dailyBills';
 import { customerService } from '@/services/customers';
@@ -128,8 +128,9 @@ export function PdfImportModal({ isOpen, onClose, onSuccess }: PdfImportModalPro
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity" onClick={() => !isImporting && onClose()} />
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl flex flex-col max-h-[90vh] z-10">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">Import Daily Bills from PDF</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
@@ -283,6 +284,7 @@ export function PdfImportModal({ isOpen, onClose, onSuccess }: PdfImportModalPro
     </div>
   );
 }
+
 
 
 
