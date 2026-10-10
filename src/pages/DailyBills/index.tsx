@@ -99,19 +99,19 @@ export default function DailyBillsPage() {
               />
             </div>
             <button 
-              onClick={() => setIsPdfImportOpen(true)}
+              onClick={() => { setEditingBill(undefined); setIsFormOpen(true); }}
               className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
             >
-              <Upload className="mr-2 h-4 w-4" />
-              Import
+              <Plus className="mr-2 h-4 w-4" />
+              Add
             </button>
           </div>
           <button 
-            onClick={() => { setEditingBill(undefined); setIsFormOpen(true); }}
+            onClick={() => setIsPdfImportOpen(true)}
             className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors shadow-sm shrink-0"
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Daily Bill
+            <Upload className="mr-2 h-4 w-4" />
+            Import Bills
           </button>
         </div>
       </div>
