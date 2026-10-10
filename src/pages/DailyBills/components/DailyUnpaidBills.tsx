@@ -1,5 +1,5 @@
 import { InlinePaymentMethodSelector } from './InlinePaymentMethodSelector';
-import { dailyBillService } from '@/services/dailyBills';
+
 import { useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
 import type { DailyBill } from '@/types';
@@ -73,4 +73,5 @@ export function DailyUnpaidBills({ bills }: DailyUnpaidBillsProps) {
     </div>
   );
 }
+
 

@@ -25,6 +25,7 @@ export function InlinePaymentMethodSelector({ bill, onUpdate }: InlinePaymentMet
       
       onUpdate(bill.id, newMethod === '' ? null : newMethod as any);
     } catch (err: any) {
+      console.error(err);
       toast.error('Failed to update payment method.');
       // It will revert visually because we don't update local state unless successful
     } finally {
@@ -48,4 +49,5 @@ export function InlinePaymentMethodSelector({ bill, onUpdate }: InlinePaymentMet
     </div>
   );
 }
+
 
