@@ -305,11 +305,11 @@ export default function DailyBillsPage() {
       )}
 
       {activeTab === 'PAID' && (
-        <DailyPaidBills bills={bills} />
+        <DailyPaidBills bills={bills} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
       )}
 
       {activeTab === 'CREDIT_BILL' && (
-        <DailyCreditBills bills={bills} />
+        <DailyCreditBills bills={bills} onSuccess={() => { dailyBillService.clearCache(); fetchBills(); }} />
       )}
 
       {activeTab === 'UNPAID' && (
@@ -350,6 +350,7 @@ export default function DailyBillsPage() {
     </div>
   );
 }
+
 
 
 

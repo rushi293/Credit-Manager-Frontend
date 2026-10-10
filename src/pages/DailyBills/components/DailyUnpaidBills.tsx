@@ -1,9 +1,7 @@
-﻿import { UnifiedPaymentSelector } from './UnifiedPaymentSelector';
-
+import { UnifiedPaymentSelector } from './UnifiedPaymentSelector';
 import { useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
 import type { DailyBill } from '@/types';
-
 
 interface DailyUnpaidBillsProps {
   bills: DailyBill[];
@@ -32,7 +30,8 @@ export function DailyUnpaidBills({ bills, onSuccess }: DailyUnpaidBillsProps) {
           <h3 className="font-semibold text-gray-900">Unpaid Bills Listing</h3>
         </div>
         
-        <div className="overflow-x-auto">
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-gray-500 uppercase bg-gray-50">
               <tr>
@@ -56,7 +55,7 @@ export function DailyUnpaidBills({ bills, onSuccess }: DailyUnpaidBillsProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
                     No unpaid bills found for this selection.
                   </td>
                 </tr>
@@ -64,13 +63,34 @@ export function DailyUnpaidBills({ bills, onSuccess }: DailyUnpaidBillsProps) {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {unpaidBills.length > 0 ? (
+            unpaidBills.map((bill) => (
+              <div key={bill.id} className="p-4 bg-white space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold text-gray-900">{bill.customer?.name}</p>
+                    <p className="text-sm text-gray-500">Bill: {bill.billNumber}</p>
+                  </div>
+                  <p className="font-bold text-gray-900">{formatCurrency(Number(bill.billAmount))}</p>
+                </div>
+                
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <UnifiedPaymentSelector bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-gray-500 text-sm">
+              No unpaid bills found for this selection.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-

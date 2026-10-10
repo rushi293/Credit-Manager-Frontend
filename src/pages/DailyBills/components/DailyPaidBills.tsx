@@ -2,12 +2,14 @@ import { useState, useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
 import type { DailyBill } from '@/types';
 import { CreditCard, Banknote, Filter } from 'lucide-react';
+import { UnifiedPaymentSelector } from './UnifiedPaymentSelector';
 
 interface DailyPaidBillsProps {
   bills: DailyBill[];
+  onSuccess?: () => void;
 }
 
-export function DailyPaidBills({ bills }: DailyPaidBillsProps) {
+export function DailyPaidBills({ bills, onSuccess }: DailyPaidBillsProps) {
   const [filter, setFilter] = useState<'All' | 'GPay' | 'Cash'>('All');
 
   const paidBills = useMemo(() => bills.filter(b => b.status === 'PAID'), [bills]);
@@ -65,14 +67,15 @@ export function DailyPaidBills({ bills }: DailyPaidBillsProps) {
           </div>
         </div>
         
-        <div className="overflow-x-auto">
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-gray-500 uppercase bg-gray-50">
               <tr>
                 <th className="px-6 py-3 font-medium">Bill No.</th>
                 <th className="px-6 py-3 font-medium">Customer Shop</th>
                 <th className="px-6 py-3 font-medium text-right">Amount</th>
-                <th className="px-6 py-3 font-medium text-center">Method</th>
+                <th className="px-6 py-3 font-medium text-center">Payment</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -83,11 +86,7 @@ export function DailyPaidBills({ bills }: DailyPaidBillsProps) {
                     <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
                     <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(Number(bill.billAmount))}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        bill.paymentMethod === 'GPay' ? 'bg-indigo-50 text-indigo-700' : 'bg-amber-50 text-amber-700'
-                      }`}>
-                        {bill.paymentMethod}
-                      </span>
+                      <UnifiedPaymentSelector bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
                     </td>
                   </tr>
                 ))
@@ -101,9 +100,34 @@ export function DailyPaidBills({ bills }: DailyPaidBillsProps) {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {filteredBills.length > 0 ? (
+            filteredBills.map((bill) => (
+              <div key={bill.id} className="p-4 bg-white space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold text-gray-900">{bill.customer?.name}</p>
+                    <p className="text-sm text-gray-500">Bill: {bill.billNumber}</p>
+                  </div>
+                  <p className="font-bold text-gray-900">{formatCurrency(Number(bill.billAmount))}</p>
+                </div>
+                
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <UnifiedPaymentSelector bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-gray-500 text-sm">
+              No paid bills found for this selection.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
-

@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
 import type { DailyBill } from '@/types';
-import { Circle } from 'lucide-react';
+import { UnifiedPaymentSelector } from './UnifiedPaymentSelector';
 
 interface DailyCreditBillsProps {
   bills: DailyBill[];
+  onSuccess?: () => void;
 }
 
-export function DailyCreditBills({ bills }: DailyCreditBillsProps) {
+export function DailyCreditBills({ bills, onSuccess }: DailyCreditBillsProps) {
   const creditBills = useMemo(() => bills.filter(b => b.status === 'CREDIT_BILL'), [bills]);
   const totalAmount = creditBills.reduce((sum, b) => sum + Number(b.billAmount), 0);
 
@@ -29,14 +30,15 @@ export function DailyCreditBills({ bills }: DailyCreditBillsProps) {
           <h3 className="font-semibold text-gray-900">Credit Bills Listing</h3>
         </div>
         
-        <div className="overflow-x-auto">
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-gray-500 uppercase bg-gray-50">
               <tr>
                 <th className="px-6 py-3 font-medium">Bill No.</th>
                 <th className="px-6 py-3 font-medium">Customer Shop</th>
                 <th className="px-6 py-3 font-medium text-right">Amount</th>
-                <th className="px-6 py-3 font-medium text-center">Status</th>
+                <th className="px-6 py-3 font-medium text-center">Payment</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -47,9 +49,7 @@ export function DailyCreditBills({ bills }: DailyCreditBillsProps) {
                     <td className="px-6 py-4 text-gray-600">{bill.customer?.name}</td>
                     <td className="px-6 py-4 text-right font-medium text-gray-900">{formatCurrency(Number(bill.billAmount))}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-flex items-center gap-1 text-indigo-600 text-xs font-medium bg-indigo-50 px-2 py-0.5 rounded">
-                        <Circle className="h-3 w-3" /> CREDIT BILL
-                      </span>
+                      <UnifiedPaymentSelector bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
                     </td>
                   </tr>
                 ))
@@ -62,6 +62,33 @@ export function DailyCreditBills({ bills }: DailyCreditBillsProps) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {creditBills.length > 0 ? (
+            creditBills.map((bill) => (
+              <div key={bill.id} className="p-4 bg-white space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold text-gray-900">{bill.customer?.name}</p>
+                    <p className="text-sm text-gray-500">Bill: {bill.billNumber}</p>
+                  </div>
+                  <p className="font-bold text-gray-900">{formatCurrency(Number(bill.billAmount))}</p>
+                </div>
+                
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <UnifiedPaymentSelector bill={bill} onSuccess={() => { if(onSuccess) onSuccess(); else window.location.reload(); }} />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-gray-500 text-sm">
+              No credit bills found for this selection.
+            </div>
+          )}
         </div>
       </div>
     </div>
