@@ -13,7 +13,19 @@ const lazyWithRetry = (componentImport: () => Promise<any>) => {
       const key = 'chunk-retry';
       if (isChunkError && !sessionStorage.getItem(key)) {
         sessionStorage.setItem(key, 'true');
-        window.location.reload();
+        
+        // If a service worker is caching the old index.html, unregister it
+        // before reloading to guarantee we fetch the fresh deployment.
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+            window.location.reload();
+          }).catch(() => window.location.reload());
+        } else {
+          window.location.reload();
+        }
         return new Promise(() => {});
       }
       sessionStorage.removeItem(key);
