@@ -342,10 +342,10 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
             </select>
           </div>
 
-          
+          {watchStatus === 'PAID' && (
             <div className="space-y-1.5">
               <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">
-                Payment Method {watchStatus === 'PAID' && <span className="text-red-500">*</span>}
+                Payment Method <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-4 mt-2">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -359,7 +359,8 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
               </div>
               {errors.paymentMethod && <p className="text-xs text-red-500">{errors.paymentMethod.message}</p>}
             </div>
-          
+          )}
+
           <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
             <button
               type="button"
@@ -381,5 +382,3 @@ export function DailyBillForm({ open, onOpenChange, onSuccess, initialData, defa
     </div>
   );
 }
-
-
