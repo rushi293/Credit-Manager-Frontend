@@ -4,17 +4,35 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ToastProvider } from '@/components/ui/toast';
 import { ThemeProvider } from '@/context/ThemeContext';
 
-const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
-const CustomersPage = React.lazy(() => import('@/pages/Customers'));
-const CustomerDetailsPage = React.lazy(() => import('@/pages/Customers/CustomerDetails'));
-const BillsPage = React.lazy(() => import('@/pages/Bills'));
-const BillDetailsPage = React.lazy(() => import('@/pages/Bills/BillDetails'));
-const PaymentsPage = React.lazy(() => import('@/pages/Payments'));
-const ReportsPage = React.lazy(() => import('@/pages/Reports'));
-const SettingsPage = React.lazy(() => import('@/pages/Settings'));
-const DailyBillsPage = React.lazy(() => import('@/pages/DailyBills'));
+const lazyWithRetry = (componentImport: () => Promise<any>) => {
+  return React.lazy(async () => {
+    try {
+      return await componentImport();
+    } catch (error: any) {
+      const isChunkError = error?.name === 'ChunkLoadError' || String(error).includes('dynamically imported module') || String(error).includes('fetch');
+      const key = 'chunk-retry';
+      if (isChunkError && !sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, 'true');
+        window.location.reload();
+        return new Promise(() => {});
+      }
+      sessionStorage.removeItem(key);
+      throw error;
+    }
+  });
+};
 
-const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
+const Dashboard = lazyWithRetry(() => import('@/pages/Dashboard'));
+const CustomersPage = lazyWithRetry(() => import('@/pages/Customers'));
+const CustomerDetailsPage = lazyWithRetry(() => import('@/pages/Customers/CustomerDetails'));
+const BillsPage = lazyWithRetry(() => import('@/pages/Bills'));
+const BillDetailsPage = lazyWithRetry(() => import('@/pages/Bills/BillDetails'));
+const PaymentsPage = lazyWithRetry(() => import('@/pages/Payments'));
+const ReportsPage = lazyWithRetry(() => import('@/pages/Reports'));
+const SettingsPage = lazyWithRetry(() => import('@/pages/Settings'));
+const DailyBillsPage = lazyWithRetry(() => import('@/pages/DailyBills'));
+
+const LoginPage = lazyWithRetry(() => import('@/pages/Auth/Login'));
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { OfflineDetector } from '@/components/pwa/OfflineDetector';
 import { SSEProvider } from '@/components/SSEProvider';
