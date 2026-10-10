@@ -52,6 +52,7 @@ export default function DailyBillsPage() {
   useAppEvent(
     ['DAILY_BILL_CREATED', 'DAILY_BILL_UPDATED', 'DAILY_BILL_DELETED', 'RECONNECTED'],
     () => {
+      dailyBillService.clearCache();
       fetchBills();
     }
   );

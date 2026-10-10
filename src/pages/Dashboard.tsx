@@ -254,6 +254,8 @@ export default function Dashboard() {
         totalExpense: editExpense ? Number(editExpense) : 0,
         totalIphoneSales: editIphone ? Number(editIphone) : 0
       });
+      metricsService.clearCache();
+      dashboardService.clearCache();
       setIsEditingMetrics(false);
       fetchMetrics();
     } catch (e) {
@@ -277,6 +279,8 @@ export default function Dashboard() {
       'METRICS_UPDATED', 'RECONNECTED'
     ],
     async () => {
+      dashboardService.clearCache();
+      metricsService.clearCache();
       await fetchDashboardData();
       await fetchMetrics();
     }
