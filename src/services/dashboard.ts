@@ -13,10 +13,12 @@ export const dashboardService = {
     }
     const params = date ? { date } : {};
     const response = await apiClient.get<ApiResponse<DashboardData>>('/dashboard', { params });
-    cache.set(key, { data: response.data.data, timestamp: Date.now() });
-    return response.data.data;
+    cache.set(key, { data: response.data.data!, timestamp: Date.now() });
+    return response.data.data as DashboardData;
   },
   clearCache() {
     cache.clear();
   }
 };
+
+
